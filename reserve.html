@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>予約 | PROJECT AI</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/reserve.css">
+</head>
+<body>
+<header>
+  <h1>PROJECT AI</h1>
+  <p>予約受付</p>
+</header>
+
+<main>
+<section class="card">
+<h2>予約フォーム</h2>
+<form id="reserveForm">
+<label>お名前</label>
+<input type="text" id="name" required>
+
+<label>人数</label>
+<select id="people" required>
+<option value="1">1人</option>
+<option value="2">2人</option>
+<option value="3">3人</option>
+<option value="4">4人</option>
+</select>
+
+<p>受付番号</p>
+<div class="ticket-number">AI-<span id="ticketPreview">---</span></div>
+
+<button type="submit">予約する</button>
+</form>
+</section>
+
+<section class="card">
+<h2>注意事項</h2>
+<ul>
+<li>予約は1人1回までです。</li>
+<li>順番が近づいたら呼び出し画面をご確認ください。</li>
+<li>キャンセルは予約状況ページから行えます。</li>
+</ul>
+</section>
+
+<p style="text-align:center"><a href="index.html">← ホームへ戻る</a></p>
+</main>
+
+<script src="js/reserve.js"></script>
+</body>
+</html>
