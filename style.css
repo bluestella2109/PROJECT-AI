@@ -252,9 +252,9 @@ body {
   margin-top: 0.5rem;
 }
 
-.red-btn { background: #d74343; color: #fff; }
+.blue-btn { background: #d74343; color: #fff; }
 .pink-btn { background: var(--neon-pink); color: #fff; }
-.pre-btn { background: #7b99bb; color: #fff; }
+.danger-btn { background: #7b99bb; color: #fff; }
 .warning-btn { background: #d7d936; color: #000; }
 
 .small-btn {
@@ -357,4 +357,79 @@ body {
   background: rgba(0,0,0,0.85);
   display: flex; justify-content: center; align-items: center;
   z-index: 1000; padding: 1rem;
+}
+/* ② 混雑状況バナー */
+.congestion-box {
+  background: rgba(0, 243, 255, 0.08);
+  border: 1px solid rgba(0, 243, 255, 0.25);
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #c0f0ff;
+}
+
+.congestion-icon {
+  font-size: 1.1rem;
+}
+
+.admin-section-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1.2rem;
+  text-align: left;
+}
+
+.admin-section-box h4 {
+  font-size: 0.9rem;
+  color: #a0c0d0;
+  margin-bottom: 0.5rem;
+}
+
+.congestion-input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.congestion-input-group .glass-input {
+  margin: 0;
+}
+
+.small-action {
+  width: auto;
+  white-space: nowrap;
+  padding: 0 1rem;
+  margin: 0;
+}
+
+/* ① テストデータリセットボタン */
+.admin-danger-zone {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(255, 0, 85, 0.05);
+  border: 1px dashed rgba(ff, 0, 85, 0.3);
+  border-radius: 10px;
+}
+
+.admin-danger-zone h4 {
+  font-size: 0.85rem;
+  color: var(--neon-pink);
+  margin-bottom: 0.5rem;
+}
+
+.reset-btn {
+  background: #7a1818;
+  color: #ffb3b3;
+  border: 1px solid #ff4d4d;
+}
+
+.reset-btn:hover {
+  background: #a32222;
+  box-shadow: 0 0 15px rgba(255, 77, 77, 0.5);
 }
