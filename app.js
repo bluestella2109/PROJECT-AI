@@ -616,27 +616,43 @@ window.updateTicketStatus = async function(ticketId, newStatus) {
   try { await updateDoc(doc(db, "tickets", ticketId), { status: newStatus }); } catch (e) {}
 };
 
-window.resetAllTestData = async function() {
+// 「データを全リセット」処理（エラー対策強化版）
+window.resetAllData = async function() {
   if (!confirm("【警告】すべての予約データおよびカウンターを初期化します。よろしいですか？")) return;
   if (!confirm("本当に実行しますか？取り消すことはできません。")) return;
 
   try {
+    // 1. 全チケットデータの取得
     const ticketsSnap = await getDocs(collection(db, "tickets"));
-    const deletePromises = ticketsSnap.docs.map(d => deleteDoc(doc(db, "tickets", d.id)));
-    await Promise.all(deletePromises);
+    
+    // 2. WriteBatch（バッチ処理）を使って安全に一括削除
+    const batch = writeBatch(db);
+    ticketsSnap.docs.forEach((docSnap) => {
+      batch.delete(docSnap.ref);
+    });
+    
+    // バッチ実行（削除確定）
+    await batch.commit();
 
-    await setDoc(doc(db, "counters", "queue"), {
+    // 3. カウンターの初期化
+    await setDoc(doc(doc(db, "counters", "queue")), {
       nextNumber: 0,
       isAccepting: true,
       congestionLevel: "smooth",
       congestionMessage: "ただいま順調にご案内中です"
     });
 
+    // 4. ローカルストレージ（自分の端末の予約保持情報）のクリア
     localStorage.removeItem("my_ticket_id");
     myTicketNumber = null;
-    alert("すべてのテストデータが正常に初期化されました。");
+
+    alert("すべてのデータを正常にリセットしました！");
     location.reload();
-  } catch (e) { alert("初期化失敗"); }
+
+  } catch (e) {
+    console.error("リセット失敗の理由:", e);
+    alert(`リセットに失敗しました。\nエラー内容: ${e.message}\n\n※Firebaseのセキュリティルール（Rules）で「delete」権限が許可されているか確認してください。`);
+  }
 };
 
 initRealtimeListeners();
