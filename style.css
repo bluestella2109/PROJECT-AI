@@ -433,3 +433,26 @@ body {
   background: #a32222;
   box-shadow: 0 0 15px rgba(255, 77, 77, 0.5);
 }
+/* タイマー表示 */
+.timer-text {
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: #ffc107;
+}
+
+/* 10分経過後の赤色チカチカ点滅アニメーション */
+@keyframes alert-blink {
+  0%, 100% { background-color: rgba(255, 0, 85, 0.4); }
+  50% { background-color: rgba(255, 0, 85, 0.05); }
+}
+
+.expired-row {
+  animation: alert-blink 0.8s infinite;
+  border: 1px solid var(--neon-pink) !important;
+}
+
+.expired-timer {
+  color: #ff4d4d !important;
+  font-weight: bold;
+}
