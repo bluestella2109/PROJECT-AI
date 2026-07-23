@@ -29,6 +29,11 @@
         <h1 class="main-title">PLOJECT AI</h1>
         <p class="main-sub">〜人類最後のアップデートが始まる〜</p>
         
+        <div class="congestion-box level-smooth top-congestion-banner">
+          <span class="congestion-icon">📢</span>
+          <span class="congestion-text">ただいま順調にご案内中です</span>
+        </div>
+
         <div class="hero-buttons">
           <button class="neon-btn btn-reserve" onclick="showPage('reserve')">
             <span class="btn-sub">Reserve</span>
@@ -44,8 +49,8 @@
       <div class="video-section">
         <h3 class="video-title">▼紹介動画</h3>
         <div class="video-container">
-          <video controls poster="紹介動画 サムネ.png">
-            <source src="文化祭予告編.mp4" type="video/mp4">
+          <video controls poster="thumbnail.jpg">
+            <source src="movie.mp4" type="video/mp4">
             お使いのブラウザは動画再生に対応していません。
           </video>
         </div>
@@ -55,7 +60,27 @@
     <section id="page-reserve" class="page">
       <div class="glass-card">
         <h2 class="section-title text-pink">新規予約</h2>
+        
+        <div id="reserve-stopped-msg" class="hidden">
+          <div class="warning-banner">⚠️ 現在、新規予約の受付を一時停止しております。</div>
+        </div>
+
         <div id="reserve-form-container">
+          <label for="time-slot">予約枠の指定 (30分枠・各最大5組):</label>
+          <select id="time-slot" class="glass-input">
+            <option value="auto">指定なし（最短の空き枠）</option>
+            <option value="09:30">09:30 - 10:00</option>
+            <option value="10:00">10:00 - 10:30</option>
+            <option value="10:30">10:30 - 11:00</option>
+            <option value="11:00">11:00 - 11:30</option>
+            <option value="11:30">11:30 - 12:00</option>
+            <option value="12:00">12:00 - 12:30</option>
+            <option value="12:30">12:30 - 13:00</option>
+            <option value="13:00">13:00 - 13:30</option>
+            <option value="13:30">13:30 - 14:00</option>
+            <option value="14:00">14:00 - 14:30</option>
+          </select>
+
           <label for="people-count">参加人数 (1〜10名):</label>
           <select id="people-count" class="glass-input">
             <option value="1">1人</option>
@@ -71,6 +96,7 @@
           </select>
           <button id="btn-submit-reserve" class="action-btn blue-btn" onclick="makeReservation()">予約を確定する</button>
         </div>
+
         <div id="already-reserved-msg" class="hidden">
           <p class="warning-text">※すでに予約済みです（1端末1回のみ）。</p>
           <button class="action-btn pink-btn" onclick="showPage('status')">自分の予約状況を見る</button>
@@ -82,9 +108,9 @@
       <div class="glass-card">
         <h2 class="section-title text-blue">リアルタイム状況</h2>
         
-        <div id="congestion-banner" class="congestion-box">
+        <div class="congestion-box level-smooth top-congestion-banner">
           <span class="congestion-icon">📢</span>
-          <span id="congestion-text" class="congestion-msg">ただいま順調にご案内中です</span>
+          <span class="congestion-text">ただいま順調にご案内中です</span>
         </div>
 
         <div class="status-dashboard">
@@ -106,6 +132,7 @@
             <div class="my-number-display">
               <span class="my-label">受付番号</span>
               <div class="my-ticket-hero" id="my-ticket-id">---</div>
+              <p>指定時間枠: <strong id="my-ticket-slot" class="text-blue">---</strong></p>
               <button class="small-btn" onclick="copyTicketId()">番号をコピー</button>
             </div>
 
@@ -137,13 +164,36 @@
         <div id="admin-panel-area" class="hidden">
           <div class="admin-header">
             <span>管理者ログイン中</span>
-            <button class="small-btn" onclick="adminLogout()">ログアウト</button>
+            <div>
+              <a href="display.html" target="_blank" class="small-btn blue-btn" style="text-decoration:none;">📺 ディスプレイ画面を開く</a>
+              <button class="small-btn" onclick="adminLogout()">ログアウト</button>
+            </div>
           </div>
 
           <div class="admin-section-box">
-            <h4>📢 混雑状況アナウンス設定</h4>
+            <h4>⚙️ 受付コントロール ＆ 一斉アナウンス</h4>
+            <div class="admin-grid-2">
+              <button id="btn-toggle-accept" class="action-btn warning-btn" onclick="toggleReservationAcceptance()">新規受付を停止する</button>
+            </div>
+            
+            <hr class="neon-divider" style="margin: 0.8rem 0;">
+
+            <h4>📢 全画面一斉ポップアップ配信（①）</h4>
             <div class="congestion-input-group">
-              <input type="text" id="input-congestion-msg" class="glass-input" placeholder="例: ただいま大変混雑しております（待ち時間約30分）">
+              <input type="text" id="input-broadcast-msg" class="glass-input" placeholder="例: ただいま機材調整のため10分間案内を中断します">
+              <button class="action-btn pink-btn small-action" onclick="sendBroadcastAnnouncement()">全員に配信</button>
+            </div>
+          </div>
+
+          <div class="admin-section-box">
+            <h4>📊 混雑状況・色分けアナウンス設定</h4>
+            <div class="congestion-input-group">
+              <select id="select-congestion-level" class="glass-input" style="width: auto;">
+                <option value="smooth">緑（順調）</option>
+                <option value="busy">黄（やや混雑）</option>
+                <option value="crowded">赤（大混雑）</option>
+              </select>
+              <input type="text" id="input-congestion-msg" class="glass-input" placeholder="アナウンス文言">
               <button class="action-btn blue-btn small-action" onclick="updateCongestionMessage()">更新</button>
             </div>
           </div>
@@ -160,6 +210,7 @@
               <thead>
                 <tr>
                   <th>番号</th>
+                  <th>時間枠</th>
                   <th>人数</th>
                   <th>状態</th>
                   <th>タイマー</th>
@@ -174,7 +225,11 @@
           <hr class="neon-divider">
 
           <div class="admin-history-section">
-            <h3>📊 統計・来場者履歴</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <h3>📊 統計・来場者履歴</h3>
+              <button class="action-btn blue-btn small-action" onclick="exportHistoryCSV()">📥 CSVダウンロード</button>
+            </div>
+
             <div class="stats-cards">
               <div class="stat-card">
                 <span class="stat-label">総予約グループ</span>
@@ -196,6 +251,7 @@
                 <thead>
                   <tr>
                     <th>番号</th>
+                    <th>時間枠</th>
                     <th>人数</th>
                     <th>最終ステータス</th>
                   </tr>
@@ -219,7 +275,7 @@
 
   <div id="notification-modal" class="modal hidden">
     <div class="modal-content glass-card blink-animation">
-      <h2 class="text-pink">お呼び出し</h2>
+      <h2 id="modal-title" class="text-pink">お呼び出し</h2>
       <p id="modal-msg">あなたの番号が呼び出されました！受付へお越しください。</p>
       <button class="action-btn blue-btn" onclick="closeModal()">確認しました</button>
     </div>
