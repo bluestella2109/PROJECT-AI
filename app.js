@@ -29,7 +29,8 @@ let myTicketNumber = localStorage.getItem("my_ticket_id") || null;
 // --- ページ切り替え ---
 window.showPage = function(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(`page-${pageId}`).classList.add('active');
+  const targetPage = document.getElementById(`page-${pageId}`);
+  if (targetPage) targetPage.classList.add('active');
   checkReservationStatus();
 };
 
@@ -39,14 +40,16 @@ function initRealtimeListeners() {
   onSnapshot(doc(db, "counters", "queue"), (docSnap) => {
     if (docSnap.exists()) {
       const data = docSnap.data();
-      document.getElementById("current-calling-num").innerText = data.currentNumber || "---";
+      const el = document.getElementById("current-calling-num");
+      if (el) el.innerText = data.currentNumber || "---";
     }
   });
 
   // 全体待機リストの監視
   const q = query(collection(db, "tickets"), where("status", "==", "待機中"));
   onSnapshot(q, (snapshot) => {
-    document.getElementById("total-waiting-count").innerText = snapshot.size;
+    const el = document.getElementById("total-waiting-count");
+    if (el) el.innerText = snapshot.size;
     updateMyWaitInfo(snapshot);
   });
 }
@@ -55,9 +58,10 @@ function initRealtimeListeners() {
 window.makeReservation = async function() {
   if (myTicketNumber) return alert("既に予約が存在します。");
 
-  const peopleCount = parseInt(document.getElementById("people-count").value);
+  const peopleSelect = document.getElementById("people-count");
+  const peopleCount = peopleSelect ? parseInt(peopleSelect.value) : 1;
   const btn = document.getElementById("btn-submit-reserve");
-  btn.disabled = true;
+  if (btn) btn.disabled = true;
 
   try {
     const newTicketId = await runTransaction(db, async (transaction) => {
@@ -66,7 +70,7 @@ window.makeReservation = async function() {
 
       let nextNum = 1;
       if (counterDoc.exists()) {
-        nextNum = counterDoc.data().nextNumber + 1;
+        nextNum = (counterDoc.data().nextNumber || 0) + 1;
       }
 
       // 番号を AI-001 形式にフォーマット
@@ -90,17 +94,17 @@ window.makeReservation = async function() {
     // ローカルストレージ保存（1端末1回）
     localStorage.setItem("my_ticket_id", newTicketId);
     myTicketNumber = newTicketId;
-    
+
     // 通知の許可リクエスト
     if ("Notification" in window) Notification.requestPermission();
 
     alert(`予約が完了しました！ あなたの番号: ${newTicketId}`);
-    showPage("status");
+    window.showPage("status");
   } catch (e) {
     console.error(e);
     alert("予約処理に失敗しました。");
   } finally {
-    btn.disabled = false;
+    if (btn) btn.disabled = false;
   }
 };
 
@@ -111,21 +115,23 @@ function updateMyWaitInfo(waitingSnapshot) {
   // 自分のチケットのリアルタイム監視
   onSnapshot(doc(db, "tickets", myTicketNumber), (docSnap) => {
     if (!docSnap.exists()) {
-      // 削除された場合等
       clearMyTicket();
       return;
     }
 
     const data = docSnap.data();
-    document.getElementById("my-ticket-id").innerText = data.ticket;
-    document.getElementById("my-status-badge").innerText = data.status;
+    const idEl = document.getElementById("my-ticket-id");
+    const badgeEl = document.getElementById("my-status-badge");
+
+    if (idEl) idEl.innerText = data.ticket;
+    if (badgeEl) badgeEl.innerText = data.status;
 
     if (data.status === "呼び出し中") {
       triggerCallNotification();
     } else if (data.status === "案内済み") {
       alert("ご案内が完了しました。ご利用ありがとうございました！");
       clearMyTicket();
-      showPage("hero");
+      window.showPage("hero");
       return;
     }
 
@@ -135,22 +141,29 @@ function updateMyWaitInfo(waitingSnapshot) {
       if (doc.id < myTicketNumber) aheadCount++;
     });
 
-    document.getElementById("my-position").innerText = aheadCount;
-    document.getElementById("my-wait-time").innerText = aheadCount * AVERAGE_WAIT_PER_GROUP;
+    const posEl = document.getElementById("my-position");
+    const waitEl = document.getElementById("my-wait-time");
+    if (posEl) posEl.innerText = aheadCount;
+    if (waitEl) waitEl.innerText = aheadCount * AVERAGE_WAIT_PER_GROUP;
   });
 }
 
 function checkReservationStatus() {
+  const reserveForm = document.getElementById("reserve-form-container");
+  const alreadyReserved = document.getElementById("already-reserved-msg");
+  const myTicketArea = document.getElementById("my-ticket-area");
+  const noTicketArea = document.getElementById("no-ticket-area");
+
   if (myTicketNumber) {
-    document.getElementById("reserve-form-container").classList.add("hidden");
-    document.getElementById("already-reserved-msg").classList.remove("hidden");
-    document.getElementById("my-ticket-area").classList.remove("hidden");
-    document.getElementById("no-ticket-area").classList.add("hidden");
+    if (reserveForm) reserveForm.classList.add("hidden");
+    if (alreadyReserved) alreadyReserved.classList.remove("hidden");
+    if (myTicketArea) myTicketArea.classList.remove("hidden");
+    if (noTicketArea) noTicketArea.classList.add("hidden");
   } else {
-    document.getElementById("reserve-form-container").classList.remove("hidden");
-    document.getElementById("already-reserved-msg").classList.add("hidden");
-    document.getElementById("my-ticket-area").classList.add("hidden");
-    document.getElementById("no-ticket-area").classList.remove("hidden");
+    if (reserveForm) reserveForm.classList.remove("hidden");
+    if (alreadyReserved) alreadyReserved.classList.add("hidden");
+    if (myTicketArea) myTicketArea.classList.add("hidden");
+    if (noTicketArea) noTicketArea.classList.remove("hidden");
   }
 }
 
@@ -161,7 +174,7 @@ window.cancelReservation = async function() {
     await updateDoc(doc(db, "tickets", myTicketNumber), { status: "キャンセル" });
     clearMyTicket();
     alert("キャンセルしました。");
-    showPage("hero");
+    window.showPage("hero");
   } catch (e) {
     alert("キャンセル処理に失敗しました。");
   }
@@ -175,13 +188,12 @@ function clearMyTicket() {
 
 // 呼び出し通知（音・ポップアップ・ブラウザ通知）
 function triggerCallNotification() {
-  document.getElementById("notification-modal").classList.remove("hidden");
-  
-  // 効果音再生 (Web Audio APIで生成)
+  const modal = document.getElementById("notification-modal");
+  if (modal) modal.classList.remove("hidden");
+
   playBeepSound();
 
-  // ブラウザ通知
-  if (Notification.permission === "granted") {
+  if ("Notification" in window && Notification.permission === "granted") {
     new Notification("【AI迷宮】お呼び出し", {
       body: "あなたの順番が来ました！受付までお越しください。",
     });
@@ -189,22 +201,29 @@ function triggerCallNotification() {
 }
 
 function playBeepSound() {
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  const osc = ctx.createOscillator();
-  osc.type = "sine";
-  osc.frequency.setValueAtTime(880, ctx.currentTime); // A5ノート
-  osc.connect(ctx.destination);
-  osc.start();
-  osc.stop(ctx.currentTime + 0.5);
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.5);
+  } catch (e) {
+    console.log("Audio play blocked", e);
+  }
 }
 
 window.closeModal = function() {
-  document.getElementById("notification-modal").classList.add("hidden");
+  const modal = document.getElementById("notification-modal");
+  if (modal) modal.classList.add("hidden");
 };
 
 window.copyTicketId = function() {
-  navigator.clipboard.writeText(myTicketNumber);
-  alert("受付番号をコピーしました");
+  if (myTicketNumber) {
+    navigator.clipboard.writeText(myTicketNumber);
+    alert("受付番号をコピーしました");
+  }
 };
 
 // --- 管理者機能 ---
@@ -224,67 +243,34 @@ window.adminLogout = function() {
 
 // 管理者の認証ステート監視
 onAuthStateChanged(auth, (user) => {
+  const loginArea = document.getElementById("admin-login-area");
+  const panelArea = document.getElementById("admin-panel-area");
+
   if (user) {
-    document.getElementById("admin-login-area").classList.add("hidden");
-    document.getElementById("admin-panel-area").classList.remove("hidden");
+    if (loginArea) loginArea.classList.add("hidden");
+    if (panelArea) panelArea.classList.remove("hidden");
     loadAdminQueue();
   } else {
-    document.getElementById("admin-login-area").classList.remove("hidden");
-    document.getElementById("admin-panel-area").classList.add("hidden");
+    if (loginArea) loginArea.classList.remove("hidden");
+    if (panelArea) panelArea.classList.add("hidden");
   }
 });
 
 function loadAdminQueue() {
-  const q = query(collection(db, "tickets"), where("status", "in", ["待機中", "呼び出し中"]), orderBy("createdAt", "asc"));
+  const q = query(
+    collection(db, "tickets"), 
+    where("status", "in", ["待機中", "呼び出し中"]), 
+    orderBy("createdAt", "asc")
+  );
+
   onSnapshot(q, (snapshot) => {
     const listEl = document.getElementById("admin-waiting-list");
+    if (!listEl) return;
     listEl.innerHTML = "";
+
     snapshot.forEach(docSnap => {
       const data = docSnap.data();
       const li = document.createElement("li");
       li.className = "queue-item";
       li.innerHTML = `
         <span>${data.ticket} (${data.people}名) - <strong>${data.status}</strong></span>
-        <button class="small-btn" onclick="completeTicket('${data.ticket}')">案内完了</button>
-      `;
-      listEl.appendChild(li);
-    });
-  });
-}
-
-// 次の組を呼び出す関数（修正版）
-window.callNext = async function() {
-  try {
-    const q = query(
-      collection(db, "tickets"), 
-      where("status", "==", "待機中"), 
-      orderBy("createdAt", "asc")
-    );
-    
-    const snapshot = await getDocs(q);
-
-    if (!snapshot.empty) {
-      // 一番古い待機中データを取得
-      const nextDoc = snapshot.docs[0];
-      const nextId = nextDoc.id;
-
-      // チケットのステータス更新
-      await updateDoc(doc(db, "tickets", nextId"), { status: "呼び出し中" });
-      
-      // カウンターの現在呼び出し番号を更新
-      await setDoc(doc(db, "counters", "queue"), { currentNumber: nextId }, { merge: true });
-    } else {
-      alert("待機中のグループはありません。");
-    }
-  } catch (e) {
-    console.error("呼び出しエラー:", e);
-    alert("呼び出し処理に失敗しました。");
-  }
-};
-
-window.completeTicket = async function(ticketId) {
-  await updateDoc(doc(db, "tickets", ticketId), { status: "案内済み" });
-};
-
-// 初期化
-initRealtimeListeners();
