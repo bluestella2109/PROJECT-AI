@@ -1,52 +1,188 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>予約 | PROJECT AI</title>
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/reserve.css">
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>予約 | PROJECT AI</title>
+
+    <link rel="stylesheet" href="css/reserve.css">
+
 </head>
+
 <body>
-<header>
-  <h1>PROJECT AI</h1>
-  <p>予約受付</p>
-</header>
 
-<main>
-<section class="card">
-<h2>予約フォーム</h2>
-<form id="reserveForm">
-<label>お名前</label>
-<input type="text" id="name" required>
+    <div class="container">
 
-<label>人数</label>
-<select id="people" required>
-<option value="1">1人</option>
-<option value="2">2人</option>
-<option value="3">3人</option>
-<option value="4">4人</option>
-</select>
+        <div class="card">
 
-<p>受付番号</p>
-<div class="ticket-number">AI-<span id="ticketPreview">---</span></div>
+            <h1>PROJECT AI</h1>
 
-<button type="submit">予約する</button>
-</form>
-</section>
+            <p>
+                人類最後のアップデートが始まる。<br>
+                参加人数を選択して予約してください。
+            </p>
 
-<section class="card">
-<h2>注意事項</h2>
-<ul>
-<li>予約は1人1回までです。</li>
-<li>順番が近づいたら呼び出し画面をご確認ください。</li>
-<li>キャンセルは予約状況ページから行えます。</li>
-</ul>
-</section>
+            <form id="reserveForm">
 
-<p style="text-align:center"><a href="index.html">← ホームへ戻る</a></p>
-</main>
+                <div>
 
-<script src="js/reserve.js"></script>
+                    <label for="people">
+                        参加人数
+                    </label>
+
+                    <select id="people" required>
+
+                        <option value="1">1人</option>
+                        <option value="2">2人</option>
+                        <option value="3">3人</option>
+                        <option value="4">4人</option>
+                        <option value="5">5人</option>
+                        <option value="6">6人</option>
+                        <option value="7">7人</option>
+                        <option value="8">8人</option>
+                        <option value="9">9人</option>
+                        <option value="10">10人</option>
+
+                    </select>
+
+                </div>
+
+                <button type="submit">
+
+                    予約する
+
+                </button>
+
+            </form>
+
+            <button
+                id="cancelButton"
+                class="cancel-button">
+
+                予約をキャンセル
+
+            </button>
+
+            <div class="loading" id="loading" style="display:none;"></div>
+
+            <div
+                class="message"
+                id="message">
+
+            </div>
+
+            <div
+                class="ticket"
+                id="ticket">
+
+            </div>
+
+            <hr style="margin:35px 0;border-color:#333;">
+
+            <h2 style="text-align:center;margin-bottom:20px;">
+                現在の待機状況
+            </h2>
+
+            <div class="status-box">
+
+                <p>
+
+                    呼び出し中
+
+                </p>
+
+                <h3 id="currentNumber">
+
+                    AI-001
+
+                </h3>
+
+            </div>
+
+            <br>
+
+            <div class="status-box">
+
+                <p>
+
+                    待機人数
+
+                </p>
+
+                <h3 id="waitingCount">
+
+                    --
+
+                </h3>
+
+            </div>
+
+            <br>
+
+            <div class="status-box">
+
+                <p>
+
+                    あなたの順番
+
+                </p>
+
+                <h3 id="queuePosition">
+
+                    --
+
+                </h3>
+
+            </div>
+
+            <br>
+
+            <div class="status-box">
+
+                <p>
+
+                    待ち時間
+
+                </p>
+
+                <h3 id="waitingTime">
+
+                    約--分
+
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- 呼び出し通知 -->
+
+    <div id="callNotice"></div>
+
+    <!-- 案内完了 -->
+
+    <div id="completeNotice"></div>
+
+    <!-- Firebase -->
+
+    <script
+        type="module"
+        src="js/firebase.js">
+    </script>
+
+    <!-- 予約処理 -->
+
+    <script
+        type="module"
+        src="js/reserve.js">
+    </script>
+
 </body>
+
 </html>
