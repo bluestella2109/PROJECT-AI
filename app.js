@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { 
-  getFirestore, doc, setDoc, getDoc, updateDoc, 
+  getFirestore, doc, setDoc, getDoc, getDocs, updateDoc, 
   runTransaction, serverTimestamp, onSnapshot, collection, query, where, orderBy 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { 
@@ -252,23 +252,34 @@ function loadAdminQueue() {
   });
 }
 
-// 次の組を呼び出す
+// 次の組を呼び出す関数（修正版）
 window.callNext = async function() {
-  const q = query(collection(db, "tickets"), where("status", "==", "待機中"), orderBy("createdAt", "asc"));
-  const snapshot = await getDoc(q); // トランザクションまたは最新取得
-  
-  // 最初のエントリを取得して「呼び出し中」に更新
-  onSnapshot(q, async (snap) => {
-    if (!snap.empty) {
-      const nextDoc = snap.docs[0];
+  try {
+    const q = query(
+      collection(db, "tickets"), 
+      where("status", "==", "待機中"), 
+      orderBy("createdAt", "asc")
+    );
+    
+    const snapshot = await getDocs(q);
+
+    if (!snapshot.empty) {
+      // 一番古い待機中データを取得
+      const nextDoc = snapshot.docs[0];
       const nextId = nextDoc.id;
 
-      await updateDoc(doc(db, "tickets", nextId), { status: "呼び出し中" });
+      // チケットのステータス更新
+      await updateDoc(doc(db, "tickets", nextId"), { status: "呼び出し中" });
+      
+      // カウンターの現在呼び出し番号を更新
       await setDoc(doc(db, "counters", "queue"), { currentNumber: nextId }, { merge: true });
     } else {
       alert("待機中のグループはありません。");
     }
-  }, { onlyOnce: true });
+  } catch (e) {
+    console.error("呼び出しエラー:", e);
+    alert("呼び出し処理に失敗しました。");
+  }
 };
 
 window.completeTicket = async function(ticketId) {
