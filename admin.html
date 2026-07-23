@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>管理画面 | PROJECT AI</title>
+
+    <link rel="stylesheet" href="css/admin.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>PROJECT AI</h1>
+
+    <p class="subtitle">
+
+        管理画面
+
+    </p>
+
+    <!-- ログイン -->
+
+    <div class="card" id="loginCard">
+
+        <h2>管理者ログイン</h2>
+
+        <input
+            type="email"
+            id="email"
+            placeholder="メールアドレス">
+
+        <input
+            type="password"
+            id="password"
+            placeholder="パスワード">
+
+        <button id="loginButton">
+
+            ログイン
+
+        </button>
+
+    </div>
+
+    <!-- 管理画面 -->
+
+    <div
+        id="adminPanel"
+        style="display:none;">
+
+        <div class="card">
+
+            <h2>
+
+                現在呼び出し中
+
+            </h2>
+
+            <div
+                id="currentNumber"
+                class="big-number">
+
+                AI-001
+
+            </div>
+
+        </div>
+
+        <div class="button-group">
+
+            <button id="callNextButton">
+
+                次の組を呼び出す
+
+            </button>
+
+            <button id="completeButton">
+
+                案内完了
+
+            </button>
+
+            <button id="logoutButton">
+
+                ログアウト
+
+            </button>
+
+        </div>
+
+        <div class="card">
+
+            <h2>
+
+                待機人数
+
+            </h2>
+
+            <div
+                id="waitingCount"
+                class="big-number">
+
+                --
+
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <h2>
+
+                待機一覧
+
+            </h2>
+
+            <table id="waitingTable">
+
+                <thead>
+
+                    <tr>
+
+                        <th>受付番号</th>
+
+                        <th>人数</th>
+
+                        <th>状態</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="card">
+
+            <h2>
+
+                呼び出し履歴
+
+            </h2>
+
+            <ul id="history">
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script type="module" src="js/firebase.js"></script>
+<script type="module" src="js/admin.js"></script>
+
+</body>
+
+</html>
