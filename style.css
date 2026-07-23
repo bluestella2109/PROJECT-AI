@@ -252,7 +252,7 @@ body {
   margin-top: 0.5rem;
 }
 
-.next-btn { background: #d74343; color: #fff; }
+.red-btn { background: #d74343; color: #fff; }
 .pink-btn { background: var(--neon-pink); color: #fff; }
 .pre-btn { background: #7b99bb; color: #fff; }
 .warning-btn { background: #d7d936; color: #000; }
