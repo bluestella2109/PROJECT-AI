@@ -274,3 +274,46 @@ function loadAdminQueue() {
       li.className = "queue-item";
       li.innerHTML = `
         <span>${data.ticket} (${data.people}名) - <strong>${data.status}</strong></span>
+        <button class="small-btn" onclick="completeTicket('${data.ticket}')">案内完了</button>
+      `;
+      listEl.appendChild(li);
+    });
+  });
+}
+
+// 次の組を呼び出す関数
+window.callNext = async function() {
+  try {
+    const q = query(
+      collection(db, "tickets"), 
+      where("status", "==", "待機中"), 
+      orderBy("createdAt", "asc")
+    );
+
+    const snapshot = await getDocs(q);
+
+    if (!snapshot.empty) {
+      const nextDoc = snapshot.docs[0];
+      const nextId = nextDoc.id;
+
+      await updateDoc(doc(db, "tickets", nextId), { status: "呼び出し中" });
+      await setDoc(doc(db, "counters", "queue"), { currentNumber: nextId }, { merge: true });
+    } else {
+      alert("待機中のグループはありません。");
+    }
+  } catch (e) {
+    console.error("呼び出しエラー:", e);
+    alert("呼び出し処理に失敗しました。インデックスが作成されているか確認してください。");
+  }
+};
+
+window.completeTicket = async function(ticketId) {
+  try {
+    await updateDoc(doc(db, "tickets", ticketId), { status: "案内済み" });
+  } catch (e) {
+    console.error("更新エラー:", e);
+  }
+};
+
+// 初期化
+initRealtimeListeners();
