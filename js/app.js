@@ -1,141 +1,165 @@
-// =========================
-// PROJECT AI - app.js
-// =========================
-
-import { db, auth } from "./firebase.js";
+// ===============================
+// PROJECT AI
+// app.js
+// ===============================
 
 // ローディング画面
-const loading = document.getElementById("loading-screen");
-
-// 通知エリア
-const notification = document.getElementById("notification");
-
-// AIメッセージ一覧
-const messages = [
-  "PROJECT AIへようこそ",
-  "AI CORE 接続完了",
-  "実験システム正常稼働中",
-  "まもなく受付を開始します",
-  "幸運を祈ります。"
-];
-
-// ページ読み込み完了
 window.addEventListener("load", () => {
 
-  // ローディングを消す
-  setTimeout(() => {
-    if (loading) {
-      loading.style.transition = "opacity 0.8s";
-      loading.style.opacity = "0";
+    const loading = document.getElementById("loading-screen");
 
-      setTimeout(() => {
-        loading.remove();
-      }, 800);
-    }
-  }, 1800);
+    setTimeout(() => {
 
-  // 通知開始
-  rotateMessages();
+        loading.style.opacity = "0";
+
+        setTimeout(() => {
+
+            loading.style.display = "none";
+
+        }, 600);
+
+    }, 1800);
 
 });
 
-// =========================
-// 通知メッセージ切り替え
-// =========================
+// ======================================
+// パララックス背景
+// ======================================
 
-function rotateMessages() {
+document.addEventListener("mousemove", (e) => {
 
-  if (!notification) return;
+    const grid = document.querySelector(".grid-background");
 
-  let index = 0;
+    if (!grid) return;
 
-  notification.textContent = messages[index];
+    const x = (e.clientX / window.innerWidth - 0.5) * 20;
+    const y = (e.clientY / window.innerHeight - 0.5) * 20;
 
-  setInterval(() => {
+    grid.style.transform =
+        `translate(${x}px, ${y}px)`;
 
-    index++;
+});
 
-    if (index >= messages.length) {
-      index = 0;
-    }
+// ======================================
+// ボタン演出
+// ======================================
 
-    notification.animate(
-      [
-        {
-          transform: "translateX(120%)",
-          opacity: 0
-        },
-        {
-          transform: "translateX(0)",
-          opacity: 1
-        }
-      ],
-      {
-        duration: 500,
-        fill: "forwards"
-      }
-    );
+document.querySelectorAll(".btn-main, .btn-sub").forEach(button => {
 
-    notification.textContent = messages[index];
+    button.addEventListener("mouseenter", () => {
 
-  }, 5000);
+        button.style.transform = "translateY(-4px) scale(1.03)";
 
-}
+    });
 
-// =========================
-// BGM
-// =========================
+    button.addEventListener("mouseleave", () => {
 
-const musicButton = document.getElementById("musicButton");
-const bgm = document.getElementById("bgm");
+        button.style.transform = "";
 
-if (musicButton && bgm) {
+    });
 
-  musicButton.addEventListener("click", () => {
+});
 
-    if (bgm.paused) {
-
-      bgm.play().catch(() => {});
-
-      musicButton.textContent = "🔊";
-
-    } else {
-
-      bgm.pause();
-
-      musicButton.textContent = "🔇";
-
-    }
-
-  });
-
-}
-
-// =========================
-// スクロールフェードイン
-// =========================
+// ======================================
+// スクロール表示アニメーション
+// ======================================
 
 const observer = new IntersectionObserver((entries) => {
 
-  entries.forEach((entry) => {
+    entries.forEach(entry => {
 
-    if (entry.isIntersecting) {
+        if (entry.isIntersecting) {
 
-      entry.target.style.opacity = "1";
-      entry.target.style.transform = "translateY(0)";
+            entry.target.classList.add("show");
 
-    }
+        }
 
-  });
+    });
+
+}, {
+    threshold: 0.2
+});
+
+document.querySelectorAll(".glass-card").forEach(card => {
+
+    card.classList.add("hidden");
+
+    observer.observe(card);
 
 });
 
-document.querySelectorAll("section").forEach((section) => {
+// ======================================
+// AI文字演出
+// ======================================
 
-  section.style.opacity = "0";
-  section.style.transform = "translateY(30px)";
-  section.style.transition = "0.6s";
+const systemText = document.querySelector(".system-text");
 
-  observer.observe(section);
+if (systemText) {
 
-});
+    const texts = [
+
+        "AI CORE ONLINE",
+        "CONNECTING...",
+        "SYSTEM READY",
+        "MISSION ACCEPTED"
+
+    ];
+
+    let index = 0;
+
+    setInterval(() => {
+
+        index++;
+
+        if (index >= texts.length) {
+
+            index = 0;
+
+        }
+
+        systemText.style.opacity = 0;
+
+        setTimeout(() => {
+
+            systemText.textContent = texts[index];
+
+            systemText.style.opacity = 1;
+
+        }, 300);
+
+    }, 2500);
+
+}
+
+// ======================================
+// デモ用（Firebase導入後に削除）
+// ======================================
+
+const currentNumber = document.getElementById("currentNumber");
+const waitingCount = document.getElementById("waitingCount");
+const waitingTime = document.getElementById("waitingTime");
+
+if (currentNumber) {
+
+    currentNumber.textContent = "AI-015";
+
+}
+
+if (waitingCount) {
+
+    waitingCount.textContent = "23人";
+
+}
+
+if (waitingTime) {
+
+    waitingTime.textContent = "約18分";
+
+}
+
+// ======================================
+// コンソール
+// ======================================
+
+console.log("%cPROJECT AI", "color:#00d9ff;font-size:24px;font-weight:bold;");
+console.log("%cSYSTEM READY", "color:#00ff88;");
