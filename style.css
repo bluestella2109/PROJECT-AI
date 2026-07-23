@@ -95,8 +95,8 @@ body {
 .container {
   max-width: 720px;
   margin: 0 auto;
-  /* 上に 70px の余白を追加して、ヘッダーとの被りを解消 */
-  padding: 300px 1rem 3rem 1rem; 
+  /* 上に 100px の余白を追加して、ヘッダーとの被りを解消 */
+  padding: 100px 1rem 3rem 1rem; 
 }
 
 .page {
