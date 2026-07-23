@@ -1,1 +1,335 @@
+// ===========================================
+// 第3回（後半）
+// PROJECT AI
+// ===========================================
 
+
+// ===========================================
+// 自分の順番を計算
+// ===========================================
+
+async function updateQueuePosition(){
+
+    const ticket =
+    localStorage.getItem(STORAGE_KEY);
+
+    if(!ticket){
+
+        return;
+
+    }
+
+    onSnapshot(waitingQuery,(snapshot)=>{
+
+        let position=0;
+
+        snapshot.forEach((docSnap)=>{
+
+            position++;
+
+            if(docSnap.id===ticket){
+
+                const positionElement=
+                document.getElementById("queuePosition");
+
+                if(positionElement){
+
+                    positionElement.textContent=
+                    position+"組待ち";
+
+                }
+
+            }
+
+        });
+
+    });
+
+}
+
+updateQueuePosition();
+
+
+// ===========================================
+// 待ち時間更新
+// ===========================================
+
+async function updateWaitingTime(){
+
+    const positionElement=
+    document.getElementById("queuePosition");
+
+    const waitingElement=
+    document.getElementById("waitingTime");
+
+    if(!positionElement||!waitingElement){
+
+        return;
+
+    }
+
+    const observer=new MutationObserver(()=>{
+
+        const text=
+        positionElement.textContent;
+
+        const number=
+        parseInt(text);
+
+        if(isNaN(number)){
+
+            return;
+
+        }
+
+        const minutes=
+        number*5;
+
+        waitingElement.textContent=
+        "約"+minutes+"分";
+
+    });
+
+    observer.observe(positionElement,{
+
+        childList:true
+
+    });
+
+}
+
+updateWaitingTime();
+
+
+// ===========================================
+// 呼び出し履歴
+// ===========================================
+
+const historyElement=
+document.getElementById("history");
+
+onSnapshot(
+
+    query(
+
+        reservationsRef,
+
+        where("status","==","completed"),
+
+        orderBy("createdAt","desc")
+
+    ),
+
+    (snapshot)=>{
+
+        if(!historyElement){
+
+            return;
+
+        }
+
+        historyElement.innerHTML="";
+
+        snapshot.forEach((docSnap)=>{
+
+            const data=
+            docSnap.data();
+
+            const li=
+            document.createElement("li");
+
+            li.textContent=
+            data.ticket;
+
+            historyElement.appendChild(li);
+
+        });
+
+    }
+
+);
+
+
+// ===========================================
+// 自分が呼ばれたか判定
+// ===========================================
+
+function checkCurrentNumber(){
+
+    onSnapshot(
+
+        countersRef,
+
+        (counter)=>{
+
+            if(!counter.exists()){
+
+                return;
+
+            }
+
+            const current=
+            counter.data().currentNumber;
+
+            const ticket=
+            localStorage.getItem(STORAGE_KEY);
+
+            if(!ticket){
+
+                return;
+
+            }
+
+            const myNumber=
+            Number(
+
+                ticket.replace("AI-","")
+
+            );
+
+            if(current>=myNumber){
+
+                showCallNotification();
+
+            }
+
+        }
+
+    );
+
+}
+
+checkCurrentNumber();
+
+
+// ===========================================
+// 通知API
+// ===========================================
+
+async function enableNotification(){
+
+    if(!("Notification" in window)){
+
+        return;
+
+    }
+
+    if(Notification.permission==="default"){
+
+        await Notification.requestPermission();
+
+    }
+
+}
+
+enableNotification();
+
+function browserNotification(){
+
+    if(Notification.permission==="granted"){
+
+        new Notification(
+
+            "PROJECT AI",
+
+            {
+
+                body:"あなたの順番です！",
+
+                icon:"assets/images/icon.png"
+
+            }
+
+        );
+
+    }
+
+}
+
+
+// ===========================================
+// showCallNotificationを書き換え
+// ===========================================
+
+const oldCallFunction=
+showCallNotification;
+
+showCallNotification=function(){
+
+    oldCallFunction();
+
+    browserNotification();
+
+};
+
+
+// ===========================================
+// 管理画面から完了になったら
+// localStorage削除
+// ===========================================
+
+function clearReservation(){
+
+    const ticket=
+    localStorage.getItem(STORAGE_KEY);
+
+    if(!ticket){
+
+        return;
+
+    }
+
+    const ref=
+    doc(
+
+        db,
+
+        "reservations",
+
+        ticket
+
+    );
+
+    onSnapshot(ref,(snap)=>{
+
+        if(!snap.exists()){
+
+            return;
+
+        }
+
+        const data=
+        snap.data();
+
+        if(
+
+            data.status==="completed"||
+
+            data.status==="cancelled"
+
+        ){
+
+            localStorage.removeItem(
+
+                STORAGE_KEY
+
+            );
+
+        }
+
+    });
+
+}
+
+clearReservation();
+
+
+// ===========================================
+// デバッグ
+// ===========================================
+
+console.log(
+
+"PROJECT AI Reserve Ready"
+
+);
