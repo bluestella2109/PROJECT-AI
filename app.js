@@ -22,10 +22,11 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-const AVERAGE_WAIT_PER_GROUP = 5; // 1組あたりの平均待ち時間（分）
+const AVERAGE_WAIT_PER_GROUP = 5; 
 let myTicketNumber = localStorage.getItem("my_ticket_id") || null;
+let activeTimers = {}; // タイマー管理用
 
-// --- ⑥ 背景サイバー数字エフェクト (Canvas) ---
+// --- 背景サイバー数字エフェクト (Canvas) ---
 function initCyberBackground() {
   const canvas = document.getElementById("cyber-canvas");
   if (!canvas) return;
@@ -47,7 +48,7 @@ function initCyberBackground() {
     ctx.fillStyle = "rgba(6, 9, 14, 0.15)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = "#889aaa"; // 薄灰色
+    ctx.fillStyle = "#889aaa";
     ctx.font = `${fontSize}px monospace`;
 
     for (let i = 0; i < drops.length; i++) {
@@ -73,14 +74,12 @@ window.showPage = function(pageId) {
 
 // --- Firebase リアルタイム監視 ---
 function initRealtimeListeners() {
-  // カウンターおよび混雑状況メッセージの監視
   onSnapshot(doc(db, "counters", "queue"), (docSnap) => {
     if (docSnap.exists()) {
       const data = docSnap.data();
       const el = document.getElementById("current-calling-num");
       if (el) el.innerText = data.currentNumber || "---";
 
-      // 混雑アナウンスメッセージの更新
       const msgEl = document.getElementById("congestion-text");
       if (msgEl) {
         msgEl.innerText = data.congestionMessage || "ただいま順調にご案内中です";
@@ -88,7 +87,6 @@ function initRealtimeListeners() {
     }
   });
 
-  // 全体待機数の監視
   const q = query(collection(db, "tickets"), where("status", "==", "待機中"));
   onSnapshot(q, (snapshot) => {
     const el = document.getElementById("total-waiting-count");
@@ -146,7 +144,9 @@ window.makeReservation = async function() {
   }
 };
 
-// --- 自分の予約状況＆待ち時間計算 ---
+// --- 自分の予約状況＆通知処理（保留・不在キャンセル対応） ---
+let lastStatus = "";
+
 function updateMyWaitInfo(waitingSnapshot) {
   if (!myTicketNumber) return;
 
@@ -163,13 +163,25 @@ function updateMyWaitInfo(waitingSnapshot) {
     if (idEl) idEl.innerText = data.ticket;
     if (badgeEl) badgeEl.innerText = data.status;
 
-    if (data.status === "呼び出し中") {
-      triggerCallNotification();
-    } else if (data.status === "案内済み") {
-      alert("ご案内が完了しました。ご利用ありがとうございました！");
-      clearMyTicket();
-      window.showPage("hero");
-      return;
+    // ステータス変更時の処理・通知
+    if (data.status !== lastStatus) {
+      if (data.status === "呼び出し中") {
+        triggerCallNotification("【お呼び出し】", "あなたの順番が来ました！受付までお越しください。");
+      } else if (data.status === "保留") {
+        triggerCallNotification("【保留通知】", "教室にいらっしゃらないため、保留されました。この番号は10分間ほど保管されます。お早めにいらっしゃるようお願いいたします。");
+        alert("教室にいらっしゃらないため、保留されました。この番号は10分間ほど保管されます。お早めにいらっしゃるようお願いいたします。");
+      } else if (data.status === "不在キャンセル") {
+        alert("保留されていた番号が一定時間が経過したためキャンセルされました。またのご予約をお待ちしております");
+        clearMyTicket();
+        window.showPage("hero");
+        return;
+      } else if (data.status === "案内済み") {
+        alert("ご案内が完了しました。ご利用ありがとうございました！");
+        clearMyTicket();
+        window.showPage("hero");
+        return;
+      }
+      lastStatus = data.status;
     }
 
     let aheadCount = 0;
@@ -203,7 +215,6 @@ function checkReservationStatus() {
   }
 }
 
-// キャンセル機能
 window.cancelReservation = async function() {
   if (!confirm("本当にキャンセルしますか？")) return;
   try {
@@ -219,15 +230,17 @@ window.cancelReservation = async function() {
 function clearMyTicket() {
   localStorage.removeItem("my_ticket_id");
   myTicketNumber = null;
+  lastStatus = "";
   checkReservationStatus();
 }
 
-// ③ 呼び出し通知（音・バイブレーション・Web Notification）
-function triggerCallNotification() {
+// 呼び出し＆保留通知
+function triggerCallNotification(title, msg) {
   const modal = document.getElementById("notification-modal");
+  const msgEl = document.getElementById("modal-msg");
+  if (msgEl) msgEl.innerText = msg;
   if (modal) modal.classList.remove("hidden");
 
-  // バイブレーション（スマホ対応）
   if ("vibrate" in navigator) {
     navigator.vibrate([500, 200, 500, 200, 1000]);
   }
@@ -235,9 +248,7 @@ function triggerCallNotification() {
   playBeepSound();
 
   if ("Notification" in window && Notification.permission === "granted") {
-    new Notification("【AI迷宮】お呼び出し", {
-      body: "あなたの順番が来ました！受付までお越しください。",
-    });
+    new Notification(title, { body: msg });
   }
 }
 
@@ -297,7 +308,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// ② 待機・呼び出し一覧のロード (人数の列を表示)
+// 管理者一覧（10分タイマー ＆ 経過後赤色点滅対応）
 function loadAdminQueue() {
   const q = query(
     collection(db, "tickets"), 
@@ -313,23 +324,75 @@ function loadAdminQueue() {
     snapshot.forEach(docSnap => {
       const data = docSnap.data();
       const tr = document.createElement("tr");
+      tr.id = `row-${data.ticket}`;
+
+      let timerHtml = "---";
+      if (data.status === "保留" && data.onHoldAt) {
+        timerHtml = `<span id="timer-${data.ticket}" class="timer-text">計算中...</span>`;
+      }
 
       tr.innerHTML = `
         <td><strong>${data.ticket}</strong></td>
         <td>${data.people}名</td>
         <td><span class="badge">${data.status}</span></td>
+        <td>${timerHtml}</td>
         <td>
           <button class="small-btn blue-btn" onclick="updateTicketStatus('${data.ticket}', '案内済み')">完了</button>
-          <button class="small-btn warning-btn" onclick="updateTicketStatus('${data.ticket}', '保留')">保留</button>
+          <button class="small-btn warning-btn" onclick="holdTicket('${data.ticket}')">保留</button>
           <button class="small-btn danger-btn" onclick="updateTicketStatus('${data.ticket}', '不在キャンセル')">不在</button>
         </td>
       `;
       tbody.appendChild(tr);
+
+      // 保留中の場合タイマー開始
+      if (data.status === "保留" && data.onHoldAt) {
+        start10MinTimer(data.ticket, data.onHoldAt.toDate ? data.onHoldAt.toDate() : new Date(data.onHoldAt));
+      }
     });
   });
 }
 
-// ④, ⑤ 履歴・統計データのロード
+// 保留ボタンクリック時（タイムスタンプ保存）
+window.holdTicket = async function(ticketId) {
+  try {
+    await updateDoc(doc(db, "tickets", ticketId), { 
+      status: "保留",
+      onHoldAt: new Date()
+    });
+  } catch (e) {
+    console.error("保留エラー:", e);
+  }
+};
+
+// 10分カウントダウンタイマーの計算と赤点滅処理
+function start10MinTimer(ticketId, holdTime) {
+  if (activeTimers[ticketId]) clearInterval(activeTimers[ticketId]);
+
+  activeTimers[ticketId] = setInterval(() => {
+    const timerEl = document.getElementById(`timer-${ticketId}`);
+    const rowEl = document.getElementById(`row-${ticketId}`);
+    if (!timerEl) {
+      clearInterval(activeTimers[ticketId]);
+      return;
+    }
+
+    const now = new Date();
+    const elapsedSeconds = Math.floor((now - holdTime) / 1000);
+    const remainingSeconds = 600 - elapsedSeconds; // 10分 = 600秒
+
+    if (remainingSeconds <= 0) {
+      timerEl.innerText = "10分経過！";
+      timerEl.classList.add("expired-timer");
+      if (rowEl) rowEl.classList.add("expired-row"); // ★ 赤色で点滅
+    } else {
+      const m = Math.floor(remainingSeconds / 60);
+      const s = remainingSeconds % 60;
+      timerEl.innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+  }, 1000);
+}
+
+// 履歴・統計データのロード
 function loadAdminHistoryAndStats() {
   const q = query(collection(db, "tickets"), orderBy("createdAt", "desc"));
 
@@ -351,7 +414,6 @@ function loadAdminHistoryAndStats() {
         guidedPeople += p;
       }
 
-      // 履歴テーブル（案内済み／キャンセル／不在）
       if (["案内済み", "キャンセル", "不在キャンセル"].includes(data.status)) {
         if (historyTbody) {
           const tr = document.createElement("tr");
@@ -365,7 +427,6 @@ function loadAdminHistoryAndStats() {
       }
     });
 
-    // 累計人数の表示更新
     const groupEl = document.getElementById("stat-total-groups");
     const peopleEl = document.getElementById("stat-total-people");
     const guidedEl = document.getElementById("stat-guided-people");
@@ -376,7 +437,7 @@ function loadAdminHistoryAndStats() {
   });
 }
 
-// ① 次の組を呼び出す
+// 次の組を呼び出す
 window.callNext = async function() {
   try {
     const q = query(
@@ -398,7 +459,7 @@ window.callNext = async function() {
   }
 };
 
-// ① 呼び出し中を一つ戻す（前の組へ）
+// 前の組へ戻す
 window.callPrev = async function() {
   try {
     const q = query(
@@ -410,10 +471,8 @@ window.callPrev = async function() {
 
     if (!snapshot.empty) {
       const currentId = snapshot.docs[0].id;
-      // ステータスを待機中に戻す
       await updateDoc(doc(db, "tickets", currentId), { status: "待機中" });
 
-      // 直前のグループ、または空に戻す
       const prevQ = query(
         collection(db, "tickets"), 
         where("status", "==", "呼び出し中"), 
@@ -431,7 +490,7 @@ window.callPrev = async function() {
   }
 };
 
-// ① スキップ（保留にする）
+// スキップ（保留にする）
 window.skipCurrent = async function() {
   try {
     const q = query(
@@ -443,7 +502,7 @@ window.skipCurrent = async function() {
 
     if (!snapshot.empty) {
       const currentId = snapshot.docs[0].id;
-      await updateDoc(doc(db, "tickets", currentId), { status: "保留" });
+      await window.holdTicket(currentId);
       alert(`${currentId} を保留にしました。次の組を呼び出します。`);
       window.callNext();
     } else {
@@ -463,7 +522,7 @@ window.updateTicketStatus = async function(ticketId, newStatus) {
   }
 };
 
-// 混雑メッセージの更新（管理者機能）
+// 混雑メッセージ更新
 window.updateCongestionMessage = async function() {
   const inputEl = document.getElementById("input-congestion-msg");
   if (!inputEl || !inputEl.value.trim()) return alert("メッセージを入力してください。");
@@ -480,7 +539,7 @@ window.updateCongestionMessage = async function() {
   }
 };
 
-// テストデータ全リセット処理（管理者機能）
+// テストデータ全リセット処理
 window.resetAllTestData = async function() {
   const confirmFirst = confirm("【警告】すべての予約データおよびカウンターを初期化します。よろしいですか？");
   if (!confirmFirst) return;
@@ -489,19 +548,16 @@ window.resetAllTestData = async function() {
   if (!confirmSecond) return;
 
   try {
-    // 1. 全チケットデータの削除
     const ticketsSnap = await getDocs(collection(db, "tickets"));
     const deletePromises = ticketsSnap.docs.map(d => deleteDoc(doc(db, "tickets", d.id)));
     await Promise.all(deletePromises);
 
-    // 2. カウンター情報の初期化
     await setDoc(doc(db, "counters", "queue"), {
       currentNumber: "---",
       nextNumber: 0,
       congestionMessage: "ただいま順調にご案内中です"
     });
 
-    // 3. ローカルストレージ削除
     localStorage.removeItem("my_ticket_id");
     myTicketNumber = null;
 
