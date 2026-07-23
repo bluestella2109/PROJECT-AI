@@ -252,10 +252,10 @@ body {
   margin-top: 0.5rem;
 }
 
-.blue-btn { background: var(--neon-blue); color: #000; }
+.next-btn { background: #d74343; color: #fff; }
 .pink-btn { background: var(--neon-pink); color: #fff; }
-.danger-btn { background: #dc3545; color: #fff; }
-.warning-btn { background: #ffc107; color: #000; }
+.pre-btn { background: #7b99bb; color: #fff; }
+.warning-btn { background: #d7d936; color: #000; }
 
 .small-btn {
   background: rgba(255, 255, 255, 0.15);
