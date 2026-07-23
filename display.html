@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>呼び出しディスプレイ - PROJECT AI</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background-color: #030508;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      padding: 1rem;
+    }
+    .display-container {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+      height: calc(100vh - 100px);
+    }
+    .calling-main-card {
+      background: rgba(0, 243, 255, 0.05);
+      border: 2px solid var(--neon-blue);
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 50px rgba(0, 243, 255, 0.2);
+    }
+    .calling-label {
+      font-size: 2.5rem;
+      color: #a0c0d0;
+      letter-spacing: 4px;
+    }
+    .calling-hero-number {
+      font-size: 8rem;
+      font-weight: bold;
+      color: var(--neon-pink);
+      text-shadow: 0 0 30px var(--neon-pink);
+      margin: 1rem 0;
+    }
+    .waiting-side-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+    .side-title {
+      font-size: 1.5rem;
+      color: var(--neon-blue);
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .display-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.8rem;
+    }
+    .display-num-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 0.8rem;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--text-color);
+    }
+    .display-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 1rem 1rem 1rem;
+    }
+    .display-clock {
+      font-size: 2rem;
+      font-weight: bold;
+      font-family: monospace;
+      color: var(--neon-blue);
+    }
+  </style>
+</head>
+<body>
+  <div class="display-header">
+    <h1 class="main-title" style="font-size: 1.8rem; margin:0;">PROJECT AI 呼び出し状況</h1>
+    <div id="clock-display" class="display-clock">00:00:00</div>
+  </div>
+
+  <div class="display-container">
+    <div class="calling-main-card">
+      <div class="calling-label">現在のお呼び出し番号</div>
+      <div id="disp-current-num" class="calling-hero-number">---</div>
+      <div id="disp-congestion-text" class="congestion-msg" style="font-size: 1.5rem; color: #fff;">ただいま順調にご案内中です</div>
+    </div>
+
+    <div class="waiting-side-card">
+      <div class="side-title">次に案内予定の方</div>
+      <div id="disp-waiting-list" class="display-grid">
+        </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, onSnapshot, collection, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDLMkpmzqZ5x3RWfAfKONtjHqWFY_iz4mk",
+      authDomain: "project-ai-b00e3.firebaseapp.com",
+      projectId: "project-ai-b00e3",
+      storageBucket: "project-ai-b00e3.firebasestorage.app",
+      messagingSenderId: "8669250721",
+      appId: "1:8669250721:web:a8ef55889da433d4699ce0",
+      measurementId: "G-GX1WBLHWBM"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 時計更新
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById("clock-display").innerText = now.toLocaleTimeString('ja-JP');
+    }, 1000);
+
+    // 呼び出し監視
+    onSnapshot(doc(db, "counters", "queue"), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        document.getElementById("disp-current-num").innerText = data.currentNumber || "---";
+        document.getElementById("disp-congestion-text").innerText = data.congestionMessage || "ただいま順調にご案内中です";
+      }
+    });
+
+    // 待機監視
+    const q = query(collection(db, "tickets"), where("status", "==", "待機中"), orderBy("createdAt", "asc"), limit(12));
+    onSnapshot(q, (snapshot) => {
+      const listEl = document.getElementById("disp-waiting-list");
+      listEl.innerHTML = "";
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const box = document.createElement("div");
+        box.className = "display-num-box";
+        box.innerText = data.ticket;
+        listEl.appendChild(box);
+      });
+    });
+  </script>
+</body>
+</html>
