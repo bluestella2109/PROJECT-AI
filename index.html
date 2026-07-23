@@ -110,7 +110,7 @@
               <p>予想待ち時間: 約 <strong id="my-wait-time">--</strong> 分</p>
             </div>
           </div>
-          <button class="action-btn danger-btn" onclick="cancelReservation()">予約をキャンセルする</button>
+          <button class="action-btn red-btn" onclick="cancelReservation()">予約をキャンセルする</button>
         </div>
 
         <div id="no-ticket-area">
@@ -126,7 +126,7 @@
         <div id="admin-login-area">
           <input type="email" id="admin-email" class="glass-input" placeholder="管理者メールアドレス">
           <input type="password" id="admin-pass" class="glass-input" placeholder="パスワード">
-          <button class="action-btn blue-btn" onclick="adminLogin()">ログイン</button>
+          <button class="action-btn red-btn" onclick="adminLogin()">ログイン</button>
         </div>
 
         <div id="admin-panel-area" class="hidden">
@@ -136,8 +136,8 @@
           </div>
 
           <div class="admin-controls-grid">
-            <button class="action-btn danger-btn" onclick="callPrev()">◀ 前に戻す</button>
-            <button class="action-btn blue-btn lg" onclick="callNext()">▶ 次の組を呼び出す</button>
+            <button class="action-btn pre-btn" onclick="callPrev()">◀ 前に戻す</button>
+            <button class="action-btn red-btn lg" onclick="callNext()">▶ 次の組を呼び出す</button>
             <button class="action-btn warning-btn" onclick="skipCurrent()">スキップ (保留)</button>
           </div>
 
@@ -200,7 +200,7 @@
     <div class="modal-content glass-card blink-animation">
       <h2 class="text-pink">お呼び出し</h2>
       <p id="modal-msg">あなたの番号が呼び出されました！受付へお越しください。</p>
-      <button class="action-btn blue-btn" onclick="closeModal()">確認しました</button>
+      <button class="action-btn red-btn" onclick="closeModal()">確認しました</button>
     </div>
   </div>
 
