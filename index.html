@@ -3,37 +3,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PLOJECT AI 予約システム</title>
+  <title>PROJECT AI 〜人類最後のアップデートが始まる〜</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="grid-bg"></div>
 
   <nav class="glass-nav">
-    <div class="logo">PlOJECT AI ~人類最後のアップデートが始まる~</div>
+    <div class="logo-group">
+      <div class="logo-title">PLOJECT AI</div>
+      <div class="logo-sub">〜人類最後のアップデートが始まる〜</div>
+    </div>
     <div class="nav-links">
-      <button onclick="showPage('hero')">TOP</button>
-      <button onclick="showPage('reserve')">予約</button>
-      <button onclick="showPage('status')">状況確認</button>
-      <button onclick="showPage('admin')" class="admin-link">管理</button>
+      <button onclick="showPage('hero')"><span class="nav-main">TOP</span></button>
+      <button onclick="showPage('reserve')"><span class="nav-main">予約</span></button>
+      <button onclick="showPage('status')"><span class="nav-sub">状況確認</span></button>
+      <button onclick="showPage('admin')"><span class="nav-sub">管理</span></button>
     </div>
   </nav>
 
   <main class="container">
     <section id="page-hero" class="page active">
       <div class="glass-card hero-card">
-        <h1 class="neon-text-blue">PLOJECT AI</h1>
-        <p class="subtitle">文化祭「PLOJECT AI」の予約エントリー</p>
+        <h1 class="main-title">PLOJECT AI</h1>
+        <p class="main-sub">〜人類最後のアップデートが始まる〜</p>
+        
         <div class="hero-buttons">
-          <button class="neon-btn blue" onclick="showPage('reserve')">予約する</button>
-          <button class="neon-btn pink" onclick="showPage('status')">現在の状況</button>
+          <button class="neon-btn btn-reserve" onclick="showPage('reserve')">
+            <span class="btn-sub">Reserve</span>
+            <span class="btn-main">予約する</span>
+          </button>
+          <button class="neon-btn btn-status" onclick="showPage('status')">
+            <span class="btn-sub">current situation</span>
+            <span class="btn-main">現在の状況</span>
+          </button>
         </div>
+      </div>
+
+      <div class="video-section">
+        <h3 class="video-title">▼紹介動画</h3>
+        <div class="video-container">
+          <video controls poster="thumbnail.jpg">
+            <source src="movie.mp4" type="video/mp4">
+            お使いのブラウザは動画再生に対応していません。
+          </video>
+
+          </div>
       </div>
     </section>
 
     <section id="page-reserve" class="page">
       <div class="glass-card">
-        <h2 class="neon-text-pink">新規予約</h2>
+        <h2 class="section-title text-pink">新規予約</h2>
         <div id="reserve-form-container">
           <label for="people-count">参加人数 (1〜10名):</label>
           <select id="people-count" class="glass-input">
@@ -48,23 +69,23 @@
             <option value="9">9人</option>
             <option value="10">10人</option>
           </select>
-          <button id="btn-submit-reserve" class="neon-btn blue" onclick="makeReservation()">予約を確定する</button>
+          <button id="btn-submit-reserve" class="action-btn blue-btn" onclick="makeReservation()">予約を確定する</button>
         </div>
         <div id="already-reserved-msg" class="hidden">
           <p class="warning-text">※すでに予約済みです（1端末1回のみ）。</p>
-          <button class="neon-btn pink" onclick="showPage('status')">自分の予約状況を見る</button>
+          <button class="action-btn pink-btn" onclick="showPage('status')">自分の予約状況を見る</button>
         </div>
       </div>
     </section>
 
     <section id="page-status" class="page">
       <div class="glass-card">
-        <h2 class="neon-text-blue">リアルタイム状況</h2>
+        <h2 class="section-title text-blue">リアルタイム状況</h2>
         
         <div class="status-dashboard">
           <div class="status-box">
             <span class="label">現在呼び出し中</span>
-            <span id="current-calling-num" class="big-number neon-text-pink">---</span>
+            <span id="current-calling-num" class="big-number text-pink">---</span>
           </div>
           <div class="status-box">
             <span class="label">全体待機組数</span>
@@ -77,14 +98,14 @@
         <div id="my-ticket-area" class="hidden">
           <h3>あなたの予約情報</h3>
           <div class="ticket-info">
-            <p>受付番号: <strong id="my-ticket-id" class="neon-text-blue">---</strong> 
+            <p>受付番号: <strong id="my-ticket-id" class="text-blue">---</strong> 
                <button class="small-btn" onclick="copyTicketId()">コピー</button>
             </p>
             <p>ステータス: <span id="my-status-badge" class="badge">---</span></p>
             <p>あなたの順番: あと <strong id="my-position">--</strong> 組</p>
             <p>予想待ち時間: 約 <strong id="my-wait-time">--</strong> 分</p>
           </div>
-          <button class="neon-btn danger" onclick="cancelReservation()">予約をキャンセルする</button>
+          <button class="action-btn danger-btn" onclick="cancelReservation()">予約をキャンセルする</button>
         </div>
 
         <div id="no-ticket-area">
@@ -95,12 +116,12 @@
 
     <section id="page-admin" class="page">
       <div class="glass-card">
-        <h2 class="neon-text-pink">運営管理パネル</h2>
+        <h2 class="section-title text-pink">運営管理パネル</h2>
 
         <div id="admin-login-area">
           <input type="email" id="admin-email" class="glass-input" placeholder="管理者メールアドレス">
           <input type="password" id="admin-pass" class="glass-input" placeholder="パスワード">
-          <button class="neon-btn blue" onclick="adminLogin()">ログイン</button>
+          <button class="action-btn blue-btn" onclick="adminLogin()">ログイン</button>
         </div>
 
         <div id="admin-panel-area" class="hidden">
@@ -110,7 +131,7 @@
           </div>
 
           <div class="admin-controls">
-            <button class="neon-btn blue lg" onclick="callNext()">▶ 次の組を呼び出す</button>
+            <button class="action-btn blue-btn lg" onclick="callNext()">▶ 次の組を呼び出す</button>
           </div>
 
           <div class="admin-queue">
@@ -124,12 +145,7 @@
 
   <div id="notification-modal" class="modal hidden">
     <div class="modal-content glass-card blink-animation">
-      <h2 class="neon-text-pink">お呼び出し</h2>
-      <p id="modal-msg">あなたの番号が呼び出されました！受付へお越しください。</p>
-      <button class="neon-btn blue" onclick="closeModal()">確認しました</button>
-    </div>
-  </div>
+      <h2 class="text-pink">お呼び出し</h2>
+      <p id="modal-msg">あなたの番号が呼び出されました！受付へお越しください。</p
 
-  <script type="module" src="app.js"></script>
-</body>
-</html>
+  
