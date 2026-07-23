@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { 
-  getFirestore, doc, setDoc, getDoc, getDocs, updateDoc, 
+  getFirestore, doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc,
   runTransaction, serverTimestamp, onSnapshot, collection, query, where, orderBy 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { 
@@ -22,7 +22,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-const AVERAGE_WAIT_PER_GROUP = 5; 
+const AVERAGE_WAIT_PER_GROUP = 5; // 1組あたりの平均待ち時間（分）
 let myTicketNumber = localStorage.getItem("my_ticket_id") || null;
 
 // --- ⑥ 背景サイバー数字エフェクト (Canvas) ---
@@ -47,7 +47,7 @@ function initCyberBackground() {
     ctx.fillStyle = "rgba(6, 9, 14, 0.15)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = "#889aaa"; // うす灰色
+    ctx.fillStyle = "#889aaa"; // 薄灰色
     ctx.font = `${fontSize}px monospace`;
 
     for (let i = 0; i < drops.length; i++) {
@@ -73,14 +73,22 @@ window.showPage = function(pageId) {
 
 // --- Firebase リアルタイム監視 ---
 function initRealtimeListeners() {
+  // カウンターおよび混雑状況メッセージの監視
   onSnapshot(doc(db, "counters", "queue"), (docSnap) => {
     if (docSnap.exists()) {
       const data = docSnap.data();
       const el = document.getElementById("current-calling-num");
       if (el) el.innerText = data.currentNumber || "---";
+
+      // 混雑アナウンスメッセージの更新
+      const msgEl = document.getElementById("congestion-text");
+      if (msgEl) {
+        msgEl.innerText = data.congestionMessage || "ただいま順調にご案内中です";
+      }
     }
   });
 
+  // 全体待機数の監視
   const q = query(collection(db, "tickets"), where("status", "==", "待機中"));
   onSnapshot(q, (snapshot) => {
     const el = document.getElementById("total-waiting-count");
@@ -282,7 +290,7 @@ onAuthStateChanged(auth, (user) => {
     if (loginArea) loginArea.classList.add("hidden");
     if (panelArea) panelArea.classList.remove("hidden");
     loadAdminQueue();
-    loadAdminHistoryAndStats(); // ④, ⑤ 履歴＆統計読み込み
+    loadAdminHistoryAndStats();
   } else {
     if (loginArea) loginArea.classList.remove("hidden");
     if (panelArea) panelArea.classList.add("hidden");
@@ -343,7 +351,7 @@ function loadAdminHistoryAndStats() {
         guidedPeople += p;
       }
 
-      // 履歴テーブルの作成（案内済み／キャンセル／不在）
+      // 履歴テーブル（案内済み／キャンセル／不在）
       if (["案内済み", "キャンセル", "不在キャンセル"].includes(data.status)) {
         if (historyTbody) {
           const tr = document.createElement("tr");
@@ -357,14 +365,18 @@ function loadAdminHistoryAndStats() {
       }
     });
 
-    // ⑤ 累計人数の表示更新
-    document.getElementById("stat-total-groups").innerText = totalGroups;
-    document.getElementById("stat-total-people").innerText = totalPeople;
-    document.getElementById("stat-guided-people").innerText = guidedPeople;
+    // 累計人数の表示更新
+    const groupEl = document.getElementById("stat-total-groups");
+    const peopleEl = document.getElementById("stat-total-people");
+    const guidedEl = document.getElementById("stat-guided-people");
+
+    if (groupEl) groupEl.innerText = totalGroups;
+    if (peopleEl) peopleEl.innerText = totalPeople;
+    if (guidedEl) guidedEl.innerText = guidedPeople;
   });
 }
 
-// ① 操作用アクション関数
+// ① 次の組を呼び出す
 window.callNext = async function() {
   try {
     const q = query(
@@ -401,7 +413,7 @@ window.callPrev = async function() {
       // ステータスを待機中に戻す
       await updateDoc(doc(db, "tickets", currentId), { status: "待機中" });
 
-      // 直前に案内した番号、または空に戻す処理
+      // 直前のグループ、または空に戻す
       const prevQ = query(
         collection(db, "tickets"), 
         where("status", "==", "呼び出し中"), 
@@ -451,6 +463,56 @@ window.updateTicketStatus = async function(ticketId, newStatus) {
   }
 };
 
-// 初期化
+// 混雑メッセージの更新（管理者機能）
+window.updateCongestionMessage = async function() {
+  const inputEl = document.getElementById("input-congestion-msg");
+  if (!inputEl || !inputEl.value.trim()) return alert("メッセージを入力してください。");
+
+  try {
+    await setDoc(doc(db, "counters", "queue"), {
+      congestionMessage: inputEl.value.trim()
+    }, { merge: true });
+    alert("混雑状況メッセージを更新しました！");
+    inputEl.value = "";
+  } catch (e) {
+    console.error("更新エラー:", e);
+    alert("更新に失敗しました。");
+  }
+};
+
+// テストデータ全リセット処理（管理者機能）
+window.resetAllTestData = async function() {
+  const confirmFirst = confirm("【警告】すべての予約データおよびカウンターを初期化します。よろしいですか？");
+  if (!confirmFirst) return;
+
+  const confirmSecond = confirm("本当に実行しますか？取り消すことはできません。");
+  if (!confirmSecond) return;
+
+  try {
+    // 1. 全チケットデータの削除
+    const ticketsSnap = await getDocs(collection(db, "tickets"));
+    const deletePromises = ticketsSnap.docs.map(d => deleteDoc(doc(db, "tickets", d.id)));
+    await Promise.all(deletePromises);
+
+    // 2. カウンター情報の初期化
+    await setDoc(doc(db, "counters", "queue"), {
+      currentNumber: "---",
+      nextNumber: 0,
+      congestionMessage: "ただいま順調にご案内中です"
+    });
+
+    // 3. ローカルストレージ削除
+    localStorage.removeItem("my_ticket_id");
+    myTicketNumber = null;
+
+    alert("すべてのテストデータが正常に初期化されました。");
+    location.reload();
+  } catch (e) {
+    console.error("リセットエラー:", e);
+    alert("データの初期化に失敗しました。");
+  }
+};
+
+// 初期化実行
 initRealtimeListeners();
 initCyberBackground();
