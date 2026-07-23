@@ -96,7 +96,7 @@ body {
   max-width: 720px;
   margin: 0 auto;
   /* 上に 70px の余白を追加して、ヘッダーとの被りを解消 */
-  padding: 150px 1rem 3rem 1rem; 
+  padding: 300px 1rem 3rem 1rem; 
 }
 
 .page {
