@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <canvas id="cyber-canvas"></canvas>
   <div class="grid-bg"></div>
 
   <nav class="glass-nav">
@@ -47,8 +48,7 @@
             <source src="movie.mp4" type="video/mp4">
             お使いのブラウザは動画再生に対応していません。
           </video>
-
-          </div>
+        </div>
       </div>
     </section>
 
@@ -98,12 +98,17 @@
         <div id="my-ticket-area" class="hidden">
           <h3>あなたの予約情報</h3>
           <div class="ticket-info">
-            <p>受付番号: <strong id="my-ticket-id" class="text-blue">---</strong> 
-               <button class="small-btn" onclick="copyTicketId()">コピー</button>
-            </p>
-            <p>ステータス: <span id="my-status-badge" class="badge">---</span></p>
-            <p>あなたの順番: あと <strong id="my-position">--</strong> 組</p>
-            <p>予想待ち時間: 約 <strong id="my-wait-time">--</strong> 分</p>
+            <div class="my-number-display">
+              <span class="my-label">受付番号</span>
+              <div class="my-ticket-hero" id="my-ticket-id">---</div>
+              <button class="small-btn" onclick="copyTicketId()">番号をコピー</button>
+            </div>
+
+            <div class="my-status-box">
+              <p>ステータス: <span id="my-status-badge" class="badge">---</span></p>
+              <p class="my-position-text">あなたの順番: あと <strong id="my-position" class="text-pink highlight-num">--</strong> 組</p>
+              <p>予想待ち時間: 約 <strong id="my-wait-time">--</strong> 分</p>
+            </div>
           </div>
           <button class="action-btn danger-btn" onclick="cancelReservation()">予約をキャンセルする</button>
         </div>
@@ -126,17 +131,65 @@
 
         <div id="admin-panel-area" class="hidden">
           <div class="admin-header">
-            <span>管理者としてログイン中</span>
+            <span>管理者ログイン中</span>
             <button class="small-btn" onclick="adminLogout()">ログアウト</button>
           </div>
 
-          <div class="admin-controls">
+          <div class="admin-controls-grid">
+            <button class="action-btn danger-btn" onclick="callPrev()">◀ 前に戻す</button>
             <button class="action-btn blue-btn lg" onclick="callNext()">▶ 次の組を呼び出す</button>
+            <button class="action-btn warning-btn" onclick="skipCurrent()">スキップ (保留)</button>
           </div>
 
           <div class="admin-queue">
-            <h3>待機一覧</h3>
-            <ul id="admin-waiting-list" class="queue-list"></ul>
+            <h3>呼び出し・待機一覧</h3>
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>番号</th>
+                  <th>人数</th>
+                  <th>状態</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="admin-waiting-tbody">
+                </tbody>
+            </table>
+          </div>
+
+          <hr class="neon-divider">
+
+          <div class="admin-history-section">
+            <h3>📊 統計・来場者履歴</h3>
+            <div class="stats-cards">
+              <div class="stat-card">
+                <span class="stat-label">総予約グループ</span>
+                <span id="stat-total-groups" class="stat-value">0</span> 組
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">総予約人数</span>
+                <span id="stat-total-people" class="stat-value text-blue">0</span> 名
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">案内完了人数</span>
+                <span id="stat-guided-people" class="stat-value text-pink">0</span> 名
+              </div>
+            </div>
+
+            <h4 class="sub-history-title">過去の履歴</h4>
+            <div class="history-table-wrapper">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>番号</th>
+                    <th>人数</th>
+                    <th>最終ステータス</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-history-tbody">
+                  </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
