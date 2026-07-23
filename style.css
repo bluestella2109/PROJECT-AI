@@ -1,17 +1,17 @@
 :root {
-  --bg-color: #080b10;
-  --card-bg: rgba(16, 24, 48, 0.6);
-  --card-border: rgba(0, 243, 255, 0.3);
+  --bg-color: #06090e;
+  --card-bg: rgba(12, 18, 32, 0.75);
+  --card-border: rgba(255, 255, 255, 0.12);
   --neon-blue: #00f3ff;
   --neon-pink: #ff0055;
-  --text-color: #e0f7fc;
+  --text-color: #e6f1f5;
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
 }
 
 body {
@@ -26,51 +26,75 @@ body {
 .grid-bg {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
-  background-size: 40px 40px;
+  background-size: 36px 36px;
   background-image: 
-    linear-gradient(to right, rgba(0, 243, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+    linear-gradient(to right, rgba(0, 243, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 243, 255, 0.04) 1px, transparent 1px);
   z-index: -1;
 }
 
-/* Glassmorphism Navigation */
+/* ヘッダー・ナビゲーション */
 .glass-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
-  background: rgba(10, 15, 30, 0.7);
+  padding: 0.8rem 1.5rem;
+  background: rgba(6, 10, 20, 0.85);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--card-border);
   position: sticky;
   top: 0;
   z-index: 100;
 }
 
-.logo {
+.logo-group {
+  text-align: left;
+}
+
+.logo-title {
+  font-family: 'Times New Roman', serif;
+  font-size: 1.3rem;
   font-weight: bold;
-  font-size: 1.2rem;
-  color: var(--neon-blue);
-  text-shadow: 0 0 10px var(--neon-blue);
+  letter-spacing: 2px;
+  color: #ffffff;
+  line-height: 1.1;
+}
+
+.logo-sub {
+  font-size: 0.65rem;
+  color: #a0b0c0;
+  letter-spacing: 0.5px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1rem;
 }
 
 .nav-links button {
   background: none;
   border: none;
-  color: var(--text-color);
-  margin-left: 1rem;
+  color: #ffffff;
   cursor: pointer;
-  transition: 0.3s;
+  font-size: 1.1rem;
+  font-weight: bold;
+  transition: color 0.3s;
 }
 
 .nav-links button:hover {
   color: var(--neon-pink);
 }
 
-/* Glassmorphism Card */
+.nav-sub {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+/* メインコンテナ */
 .container {
-  max-width: 800px;
-  margin: 2rem auto;
+  max-width: 720px;
+  margin: 1.5rem auto;
   padding: 0 1rem;
 }
 
@@ -82,86 +106,178 @@ body {
   display: block;
 }
 
+/* ガラス風カードデザイン */
 .glass-card {
   background: var(--card-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--card-border);
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border-radius: 20px;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  margin-bottom: 1.5rem;
+}
+
+/* ヒーロー（トップページ）タイトル */
+.main-title {
+  font-family: 'Times New Roman', serif;
+  font-size: 2.8rem;
+  font-weight: bold;
+  letter-spacing: 3px;
+  color: #ffffff;
+  margin-bottom: 0.3rem;
+}
+
+.main-sub {
+  font-size: 0.95rem;
+  color: #d0dbe5;
   margin-bottom: 2rem;
+  letter-spacing: 1px;
 }
 
-/* テキスト・ボタン演出 */
-.neon-text-blue {
-  color: var(--neon-blue);
-  text-shadow: 0 0 10px var(--neon-blue);
-}
-
-.neon-text-pink {
-  color: var(--neon-pink);
-  text-shadow: 0 0 10px var(--neon-pink);
-}
-
-.subtitle {
-  margin: 1rem 0 2rem 0;
-  opacity: 0.8;
+/* カプセル風ボタン */
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
 }
 
 .neon-btn {
-  background: transparent;
-  border: 2px solid;
-  padding: 0.8rem 1.8rem;
-  border-radius: 8px;
-  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 180px;
+  padding: 0.7rem 1rem;
+  border-radius: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   cursor: pointer;
   transition: all 0.3s ease;
-  margin: 0.5rem;
 }
 
-.neon-btn.blue {
-  color: var(--neon-blue);
-  border-color: var(--neon-blue);
-  box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+/* 予約ボタン（赤） */
+.btn-reserve {
+  background: linear-gradient(135deg, #7a2b2b, #4a1818);
+  color: #ffffff;
 }
 
-.neon-btn.blue:hover {
-  background: var(--neon-blue);
-  color: #000;
-  box-shadow: 0 0 20px var(--neon-blue);
+.btn-reserve:hover {
+  box-shadow: 0 0 20px rgba(255, 80, 80, 0.6);
+  transform: translateY(-2px);
 }
 
-.neon-btn.pink {
-  color: var(--neon-pink);
-  border-color: var(--neon-pink);
-  box-shadow: 0 0 10px rgba(ff, 0, 85, 0.3);
+/* 現在の状況ボタン（青） */
+.btn-status {
+  background: linear-gradient(135deg, #2b425b, #152436);
+  color: #ffffff;
 }
 
-.neon-btn.pink:hover {
-  background: var(--neon-pink);
-  color: #fff;
-  box-shadow: 0 0 20px var(--neon-pink);
+.btn-status:hover {
+  box-shadow: 0 0 20px rgba(80, 160, 255, 0.6);
+  transform: translateY(-2px);
 }
 
-.neon-btn.danger {
-  color: #ff4444;
-  border-color: #ff4444;
+.btn-sub {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  font-family: 'Times New Roman', serif;
 }
 
-.neon-btn.danger:hover {
-  background: #ff4444;
-  color: #fff;
+.btn-main {
+  font-size: 1.25rem;
+  font-weight: bold;
 }
+
+/* 動画エリア */
+.video-section {
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.video-title {
+  font-size: 1.3rem;
+  color: #ffffff;
+  margin-bottom: 0.8rem;
+  letter-spacing: 1px;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 比率 */
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.video-container video,
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 汎用パーツ・テキスト */
+.text-blue { color: var(--neon-blue); }
+.text-pink { color: var(--neon-pink); }
 
 .glass-input {
   width: 100%;
-  padding: 0.8rem;
+  padding: 0.9rem;
   margin: 1rem 0;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--card-border);
   color: var(--text-color);
   border-radius: 8px;
+  font-size: 1rem;
+}
+
+.action-btn {
+  width: 100%;
+  padding: 0.9rem;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 1rem;
+}
+
+.blue-btn {
+  background: var(--neon-blue);
+  color: #000;
+}
+
+.blue-btn:hover {
+  box-shadow: 0 0 15px var(--neon-blue);
+}
+
+.pink-btn {
+  background: var(--neon-pink);
+  color: #fff;
+}
+
+.danger-btn {
+  background: #dc3545;
+  color: #fff;
+}
+
+.small-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--card-border);
+  color: #fff;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
 }
 
 /* ダッシュボード UI */
@@ -171,12 +287,8 @@ body {
   margin: 1.5rem 0;
 }
 
-.status-box {
-  text-align: center;
-}
-
 .big-number {
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   font-weight: bold;
   display: block;
 }
@@ -184,16 +296,16 @@ body {
 .neon-divider {
   border: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+  background: linear-gradient(90deg, transparent, var(--card-border), transparent);
   margin: 1.5rem 0;
 }
 
 .hidden { display: none !important; }
 
-/* 点滅アニメーション（画面呼び出し用） */
+/* 呼び出し点滅アニメーション */
 @keyframes neon-blink {
-  0%, 100% { opacity: 1; box-shadow: 0 0 30px var(--neon-pink); }
-  50% { opacity: 0.3; box-shadow: 0 0 5px var(--neon-pink); }
+  0%, 100% { opacity: 1; box-shadow: 0 0 35px var(--neon-pink); }
+  50% { opacity: 0.4; box-shadow: 0 0 10px var(--neon-pink); }
 }
 
 .blink-animation {
@@ -205,21 +317,24 @@ body {
 .modal {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0,0,0,0.85);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  padding: 1rem;
 }
 
 .queue-list {
   list-style: none;
   margin-top: 1rem;
+  text-align: left;
 }
 
 .queue-item {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 0.8rem;
   border-bottom: 1px solid rgba(255,255,255,0.1);
 }
