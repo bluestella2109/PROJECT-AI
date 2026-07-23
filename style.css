@@ -22,17 +22,15 @@ body {
   position: relative;
 }
 
-/* ⑥ ランダム数字背景 Canvas */
 #cyber-canvas {
   position: fixed;
   top: 0; left: 0;
   width: 100vw; height: 100vh;
   z-index: -2;
-  opacity: 0.18; /* 薄灰色で主張しすぎない透過度 */
+  opacity: 0.18;
   pointer-events: none;
 }
 
-/* 背景グリッドエフェクト */
 .grid-bg {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
@@ -44,7 +42,6 @@ body {
   pointer-events: none;
 }
 
-/* ヘッダー */
 .glass-nav {
   display: flex;
   justify-content: space-between;
@@ -60,59 +57,26 @@ body {
   z-index: 100;
 }
 
-.logo-group {
-  text-align: left;
-  flex-shrink: 1;
-  min-width: 0;
-}
+.logo-group { text-align: left; flex-shrink: 1; min-width: 0; }
+.logo-title { font-family: 'Times New Roman', serif; font-size: 1.1rem; font-weight: bold; color: #ffffff; white-space: nowrap; }
+.logo-sub { font-size: 0.55rem; color: #a0b0c0; white-space: nowrap; }
 
-.logo-title {
-  font-family: 'Times New Roman', serif;
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #ffffff;
-  white-space: nowrap;
-}
-
-.logo-sub {
-  font-size: 0.55rem;
-  color: #a0b0c0;
-  white-space: nowrap;
-}
-
-.nav-links {
-  display: flex;
-  gap: 0.5rem;
-  flex-shrink: 0;
-}
-
-.nav-links button {
-  background: none;
-  border: none;
-  color: #ffffff;
-  cursor: pointer;
-  padding: 0.2rem 0.3rem;
-  transition: color 0.3s;
-}
-
-.nav-links button:hover {
-  color: var(--neon-pink);
-}
+.nav-links { display: flex; gap: 0.5rem; flex-shrink: 0; }
+.nav-links button { background: none; border: none; color: #ffffff; cursor: pointer; padding: 0.2rem 0.3rem; transition: color 0.3s; }
+.nav-links button:hover { color: var(--neon-pink); }
 
 .nav-main { font-size: 0.85rem; font-weight: bold; }
 .nav-sub { font-size: 0.8rem; opacity: 0.9; }
 
-/* メインコンテナ */
 .container {
   max-width: 720px;
   margin: 0 auto;
-  padding: 120px 1rem 3rem 1rem; /* ヘッダーかぶり回避 */
+  padding: 120px 1rem 3rem 1rem;
 }
 
 .page { display: none; }
 .page.active { display: block; }
 
-/* ガラスカード */
 .glass-card {
   background: var(--card-bg);
   backdrop-filter: blur(16px);
@@ -125,243 +89,27 @@ body {
   margin-bottom: 1.5rem;
 }
 
-.main-title {
-  font-family: 'Times New Roman', serif;
-  font-size: 2.2rem;
-  font-weight: bold;
-  color: #ffffff;
-  margin-bottom: 0.2rem;
-}
+.main-title { font-family: 'Times New Roman', serif; font-size: 2.2rem; font-weight: bold; color: #ffffff; margin-bottom: 0.2rem; }
+.main-sub { font-size: 0.8rem; color: #d0dbe5; margin-bottom: 1.8rem; }
 
-.main-sub {
-  font-size: 0.8rem;
-  color: #d0dbe5;
-  margin-bottom: 1.8rem;
-}
-
-.hero-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  flex-direction: column;
-  align-items: center;
-}
-
+.hero-buttons { display: flex; justify-content: center; gap: 1rem; flex-direction: column; align-items: center; }
 @media (min-width: 480px) {
   .hero-buttons { flex-direction: row; }
   .main-title { font-size: 2.6rem; }
 }
 
 .neon-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 240px;
-  padding: 0.7rem 1rem;
-  border-radius: 40px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  cursor: pointer;
-  transition: all 0.3s ease;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 100%; max-width: 240px; padding: 0.7rem 1rem; border-radius: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer; transition: all 0.3s ease;
 }
-
 .btn-reserve { background: linear-gradient(135deg, #7a2b2b, #4a1818); color: #ffffff; }
 .btn-status { background: linear-gradient(135deg, #2b425b, #152436); color: #ffffff; }
-
 .btn-sub { font-size: 0.65rem; opacity: 0.8; font-family: 'Times New Roman', serif; }
 .btn-main { font-size: 1.15rem; font-weight: bold; }
 
-/* 動画エリア */
-.video-section { margin-top: 1.5rem; text-align: left; }
-.video-title { font-size: 1.2rem; color: #ffffff; margin-bottom: 0.6rem; }
-
-.video-container {
-  position: relative;
-  width: 100%;
-  padding-top: 56.25%;
-  background: #000;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.video-container video {
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  object-fit: cover;
-}
-
-/* ⑦ 自分の受付番号拡大スタイル */
-.my-number-display {
-  background: rgba(0, 243, 255, 0.05);
-  border: 1px dashed var(--neon-blue);
-  border-radius: 12px;
-  padding: 1rem;
-  margin: 1rem 0;
-}
-
-.my-label {
-  font-size: 0.85rem;
-  color: #a0c0d0;
-}
-
-.my-ticket-hero {
-  font-size: 3rem;
-  font-weight: bold;
-  color: var(--neon-blue);
-  letter-spacing: 3px;
-  text-shadow: 0 0 15px rgba(0, 243, 255, 0.6);
-  margin: 0.2rem 0;
-}
-
-.highlight-num {
-  font-size: 1.8rem;
-  margin: 0 0.2rem;
-}
-
-.my-position-text {
-  font-size: 1.2rem;
-  margin: 0.5rem 0;
-}
-
-/* フォーム・ボタン類 */
-.text-blue { color: var(--neon-blue); }
-.text-pink { color: var(--neon-pink); }
-
-.glass-input {
-  width: 100%;
-  padding: 0.8rem;
-  margin: 0.8rem 0;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--card-border);
-  color: var(--text-color);
-  border-radius: 8px;
-  font-size: 1rem;
-}
-
-.action-btn {
-  width: 100%;
-  padding: 0.8rem;
-  border-radius: 8px;
-  border: none;
-  font-weight: bold;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: 0.3s;
-  margin-top: 0.5rem;
-}
-
-.blue-btn { background: #d74343; color: #fff; }
-.pink-btn { background: var(--neon-pink); color: #fff; }
-.danger-btn { background: #7b99bb; color: #fff; }
-.warning-btn { background: #d7d936; color: #000; }
-
-.small-btn {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid var(--card-border);
-  color: #fff;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.75rem;
-  margin: 0.2rem;
-}
-
-/* 管理者画面の操作ボタン＆テーブル */
-.admin-controls-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr 1fr;
-  gap: 0.5rem;
-  margin: 1rem 0;
-}
-
-.admin-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 0.8rem;
-  font-size: 0.85rem;
-}
-
-.admin-table th, .admin-table td {
-  padding: 0.6rem 0.4rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  text-align: center;
-}
-
-.admin-table th {
-  background: rgba(255, 255, 255, 0.05);
-  color: #a0c0d0;
-}
-
-/* ⑤ 統計カード */
-.stats-cards {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-  margin: 1rem 0;
-}
-
-.stat-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--card-border);
-  border-radius: 10px;
-  padding: 0.8rem 0.4rem;
-}
-
-.stat-label {
-  font-size: 0.7rem;
-  display: block;
-  color: #a0a0a0;
-}
-
-.stat-value {
-  font-size: 1.4rem;
-  font-weight: bold;
-}
-
-.history-table-wrapper {
-  max-height: 250px;
-  overflow-y: auto;
-}
-
-/* 共通UI */
-.status-dashboard {
-  display: flex;
-  justify-content: space-around;
-  margin: 1.2rem 0;
-}
-
-.big-number { font-size: 2.4rem; font-weight: bold; display: block; }
-
-.neon-divider {
-  border: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--card-border), transparent);
-  margin: 1.2rem 0;
-}
-
-.hidden { display: none !important; }
-
-/* 点滅モーダル */
-@keyframes neon-blink {
-  0%, 100% { opacity: 1; box-shadow: 0 0 35px var(--neon-pink); }
-  50% { opacity: 0.4; box-shadow: 0 0 10px var(--neon-pink); }
-}
-
-.blink-animation { animation: neon-blink 1s infinite; border-color: var(--neon-pink) !important; }
-
-.modal {
-  position: fixed;
-  top: 0; left: 0; width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.85);
-  display: flex; justify-content: center; align-items: center;
-  z-index: 1000; padding: 1rem;
-}
-/* ② 混雑状況バナー */
+/* ⑥ 混雑状況バナーの色分け表示 */
 .congestion-box {
-  background: rgba(0, 243, 255, 0.08);
-  border: 1px solid rgba(0, 243, 255, 0.25);
   border-radius: 10px;
   padding: 0.6rem 1rem;
   margin-bottom: 1.2rem;
@@ -370,89 +118,116 @@ body {
   justify-content: center;
   gap: 0.5rem;
   font-size: 0.9rem;
-  color: #c0f0ff;
+  transition: all 0.3s ease;
 }
+.congestion-box.level-smooth { background: rgba(0, 255, 136, 0.12); border: 1px solid #00ff88; color: #88ffcc; }
+.congestion-box.level-busy { background: rgba(255, 193, 7, 0.12); border: 1px solid #ffc107; color: #ffe082; }
+.congestion-box.level-crowded { background: rgba(255, 0, 85, 0.15); border: 1px solid var(--neon-pink); color: #ff80ab; }
 
-.congestion-icon {
-  font-size: 1.1rem;
-}
-
-.admin-section-box {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--card-border);
-  border-radius: 10px;
+.warning-banner {
+  background: rgba(255, 0, 85, 0.15);
+  border: 1px solid var(--neon-pink);
+  color: #ff80ab;
   padding: 1rem;
-  margin-bottom: 1.2rem;
-  text-align: left;
-}
-
-.admin-section-box h4 {
-  font-size: 0.9rem;
-  color: #a0c0d0;
-  margin-bottom: 0.5rem;
-}
-
-.congestion-input-group {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.congestion-input-group .glass-input {
-  margin: 0;
-}
-
-.small-action {
-  width: auto;
-  white-space: nowrap;
-  padding: 0 1rem;
-  margin: 0;
-}
-
-/* ① テストデータリセットボタン */
-.admin-danger-zone {
-  margin-top: 1.5rem;
-  padding: 1rem;
-  background: rgba(255, 0, 85, 0.05);
-  border: 1px dashed rgba(ff, 0, 85, 0.3);
-  border-radius: 10px;
-}
-
-.admin-danger-zone h4 {
-  font-size: 0.85rem;
-  color: var(--neon-pink);
-  margin-bottom: 0.5rem;
-}
-
-.reset-btn {
-  background: #7a1818;
-  color: #ffb3b3;
-  border: 1px solid #ff4d4d;
-}
-
-.reset-btn:hover {
-  background: #a32222;
-  box-shadow: 0 0 15px rgba(255, 77, 77, 0.5);
-}
-/* タイマー表示 */
-.timer-text {
-  font-family: monospace;
+  border-radius: 12px;
   font-weight: bold;
-  font-size: 0.9rem;
-  color: #ffc107;
+  margin-bottom: 1rem;
 }
 
-/* 10分経過後の赤色チカチカ点滅アニメーション */
+.video-section { margin-top: 1.5rem; text-align: left; }
+.video-title { font-size: 1.2rem; color: #ffffff; margin-bottom: 0.6rem; }
+.video-container {
+  position: relative; width: 100%; padding-top: 56.25%; background: #000;
+  border-radius: 12px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.video-container video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+
+.my-number-display {
+  background: rgba(0, 243, 255, 0.05);
+  border: 1px dashed var(--neon-blue);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+.my-label { font-size: 0.85rem; color: #a0c0d0; }
+.my-ticket-hero {
+  font-size: 3rem; font-weight: bold; color: var(--neon-blue);
+  letter-spacing: 3px; text-shadow: 0 0 15px rgba(0, 243, 255, 0.6); margin: 0.2rem 0;
+}
+
+.text-blue { color: var(--neon-blue); }
+.text-pink { color: var(--neon-pink); }
+
+.glass-input {
+  width: 100%; padding: 0.8rem; margin: 0.8rem 0;
+  background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border);
+  color: var(--text-color); border-radius: 8px; font-size: 1rem;
+}
+.glass-input option { background: #0c1220; color: #fff; }
+
+.action-btn {
+  width: 100%; padding: 0.8rem; border-radius: 8px; border: none;
+  font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.3s; margin-top: 0.5rem;
+}
+.blue-btn { background: #d74343; color: #fff; }
+.pink-btn { background: var(--neon-pink); color: #fff; }
+.danger-btn { background: #7b99bb; color: #fff; }
+.warning-btn { background: #d7d936; color: #000; }
+
+.small-btn {
+  background: rgba(255, 255, 255, 0.15); border: 1px solid var(--card-border);
+  color: #fff; padding: 0.2rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.75rem; margin: 0.2rem;
+}
+
+.admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.admin-section-box {
+  background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border);
+  border-radius: 10px; padding: 1rem; margin-bottom: 1.2rem; text-align: left;
+}
+.admin-section-box h4 { font-size: 0.9rem; color: #a0c0d0; margin-bottom: 0.5rem; }
+.congestion-input-group { display: flex; gap: 0.5rem; }
+.congestion-input-group .glass-input { margin: 0; }
+.small-action { width: auto; white-space: nowrap; padding: 0 1rem; margin: 0; }
+
+.admin-controls-grid { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 0.5rem; margin: 1rem 0; }
+
+.admin-table { width: 100%; border-collapse: collapse; margin-top: 0.8rem; font-size: 0.85rem; }
+.admin-table th, .admin-table td { padding: 0.6rem 0.4rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); text-align: center; }
+.admin-table th { background: rgba(255, 255, 255, 0.05); color: #a0c0d0; }
+
+.timer-text { font-family: monospace; font-weight: bold; font-size: 0.9rem; color: #ffc107; }
+
 @keyframes alert-blink {
   0%, 100% { background-color: rgba(255, 0, 85, 0.4); }
   50% { background-color: rgba(255, 0, 85, 0.05); }
 }
+.expired-row { animation: alert-blink 0.8s infinite; border: 1px solid var(--neon-pink) !important; }
+.expired-timer { color: #ff4d4d !important; font-weight: bold; }
 
-.expired-row {
-  animation: alert-blink 0.8s infinite;
-  border: 1px solid var(--neon-pink) !important;
+.stats-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 1rem 0; }
+.stat-card { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border); border-radius: 10px; padding: 0.8rem 0.4rem; }
+.stat-label { font-size: 0.7rem; display: block; color: #a0a0a0; }
+.stat-value { font-size: 1.4rem; font-weight: bold; }
+
+.history-table-wrapper { max-height: 250px; overflow-y: auto; }
+
+.admin-danger-zone { margin-top: 1.5rem; padding: 1rem; background: rgba(255, 0, 85, 0.05); border: 1px dashed rgba(255, 0, 85, 0.3); border-radius: 10px; }
+.admin-danger-zone h4 { font-size: 0.85rem; color: var(--neon-pink); margin-bottom: 0.5rem; }
+.reset-btn { background: #7a1818; color: #ffb3b3; border: 1px solid #ff4d4d; }
+
+.status-dashboard { display: flex; justify-content: space-around; margin: 1.2rem 0; }
+.big-number { font-size: 2.4rem; font-weight: bold; display: block; }
+
+.neon-divider { border: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--card-border), transparent); margin: 1.2rem 0; }
+.hidden { display: none !important; }
+
+@keyframes neon-blink {
+  0%, 100% { opacity: 1; box-shadow: 0 0 35px var(--neon-pink); }
+  50% { opacity: 0.4; box-shadow: 0 0 10px var(--neon-pink); }
 }
+.blink-animation { animation: neon-blink 1s infinite; border-color: var(--neon-pink) !important; }
 
-.expired-timer {
-  color: #ff4d4d !important;
-  font-weight: bold;
+.modal {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 1rem;
 }
