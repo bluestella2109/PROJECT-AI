@@ -73,11 +73,8 @@ function initRealtimeListeners() {
   onSnapshot(doc(db, "counters", "queue"), (docSnap) => {
     if (docSnap.exists()) {
       const data = docSnap.data();
-      
-      const callingEl = document.getElementById("current-calling-num");
-      if (callingEl) callingEl.innerText = data.currentNumber || "---";
 
-      // ⑥ 混雑状況・色分けの反映（TOPと状況確認の両方へ）
+      // 混雑状況・色分けの反映（TOPと状況確認の両方へ）
       const level = data.congestionLevel || "smooth";
       const msg = data.congestionMessage || "ただいま順調にご案内中です";
 
@@ -87,11 +84,11 @@ function initRealtimeListeners() {
         if (textEl) textEl.innerText = msg;
       });
 
-      // ② 受付停止トグルの反映
+      // 受付停止トグルの反映
       isAcceptingReservations = data.isAccepting !== false;
       updateAcceptanceUI();
 
-      // ① 全員へ一斉アナウンスの受信用
+      // 一斉アナウンスの受信用
       if (data.broadcastMsg && data.broadcastTime !== lastBroadcastTimestamp) {
         lastBroadcastTimestamp = data.broadcastTime;
         triggerCallNotification("【運営からのお知らせ】", data.broadcastMsg);
@@ -99,13 +96,31 @@ function initRealtimeListeners() {
     }
   });
 
-  // 全体待機数 ＆ ③ 枠ごとの満杯チェック
+  // ★「現在呼び出し中」の全チケットを監視して複数表示
+  const qCalling = query(collection(db, "tickets"), where("status", "==", "呼び出し中"), orderBy("createdAt", "asc"));
+  onSnapshot(qCalling, (snapshot) => {
+    const container = document.getElementById("current-calling-container");
+    if (!container) return;
+    container.innerHTML = "";
+
+    if (snapshot.empty) {
+      container.innerHTML = '<span class="big-number text-pink">---</span>';
+    } else {
+      snapshot.forEach(docSnap => {
+        const badge = document.createElement("div");
+        badge.className = "calling-badge";
+        badge.innerText = docSnap.data().ticket;
+        container.appendChild(badge);
+      });
+    }
+  });
+
+  // 全体待機数 ＆ 枠ごとの満杯チェック
   const q = query(collection(db, "tickets"), where("status", "==", "待機中"));
   onSnapshot(q, (snapshot) => {
     const el = document.getElementById("total-waiting-count");
     if (el) el.innerText = snapshot.size;
 
-    // 時間枠の空き状況集計
     const slotCounts = {};
     TIME_SLOTS.forEach(s => slotCounts[s] = 0);
 
@@ -119,7 +134,6 @@ function initRealtimeListeners() {
   });
 }
 
-// ③ 時間枠セレクトボックスの満杯判定
 function updateSlotSelectOptions(slotCounts) {
   const select = document.getElementById("time-slot");
   if (!select) return;
@@ -137,7 +151,7 @@ function updateSlotSelectOptions(slotCounts) {
   });
 }
 
-// ③ 予約処理（指定なしの場合は最短空き枠）
+// 予約処理
 window.makeReservation = async function() {
   if (!isAcceptingReservations) return alert("現在、新規予約の受付は停止しております。");
   if (myTicketNumber) return alert("既に予約が存在します。");
@@ -155,7 +169,6 @@ window.makeReservation = async function() {
       const counterRef = doc(db, "counters", "queue");
       const counterDoc = await transaction.get(counterRef);
 
-      // 時間枠の決定（指定なしの場合は最短の空き枠を探す）
       if (chosenSlot === "auto") {
         for (let slot of TIME_SLOTS) {
           const qSlot = query(collection(db, "tickets"), where("timeSlot", "==", slot), where("status", "==", "待機中"));
@@ -207,7 +220,6 @@ window.makeReservation = async function() {
   }
 };
 
-// 予約状況確認＆個別の通知
 let lastStatus = "";
 function updateMyWaitInfo(waitingSnapshot) {
   if (!myTicketNumber) return;
@@ -380,16 +392,12 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// ② 受付一時停止トグルの更新
 window.toggleReservationAcceptance = async function() {
   try {
     await setDoc(doc(db, "counters", "queue"), { isAccepting: !isAcceptingReservations }, { merge: true });
-  } catch (e) {
-    alert("切り替え失敗");
-  }
+  } catch (e) { alert("切り替え失敗"); }
 };
 
-// ① 全画面一斉ポップアップ配信
 window.sendBroadcastAnnouncement = async function() {
   const msgInput = document.getElementById("input-broadcast-msg");
   if (!msgInput || !msgInput.value.trim()) return alert("メッセージを入力してください。");
@@ -401,12 +409,35 @@ window.sendBroadcastAnnouncement = async function() {
     }, { merge: true });
     alert("全員の画面へ一斉配信しました！");
     msgInput.value = "";
+  } catch (e) { alert("配信失敗"); }
+};
+
+// ★ 指定した時間枠のグループを全一括呼び出し
+window.callEntireSlot = async function() {
+  const slotSelect = document.getElementById("select-call-slot");
+  const targetSlot = slotSelect ? slotSelect.value : "";
+  if (!targetSlot) return;
+
+  if (!confirm(`【確認】${targetSlot} 枠で待機中のすべての組を一括呼び出しますか？`)) return;
+
+  try {
+    const q = query(collection(db, "tickets"), where("timeSlot", "==", targetSlot), where("status", "==", "待機中"));
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      return alert(`${targetSlot} 枠で待機中の組はありません。`);
+    }
+
+    const updatePromises = snapshot.docs.map(d => updateDoc(doc(db, "tickets", d.id), { status: "呼び出し中" }));
+    await Promise.all(updatePromises);
+
+    alert(`${targetSlot} 枠の ${snapshot.size} 組を一括呼び出しました！`);
   } catch (e) {
-    alert("配信失敗");
+    console.error(e);
+    alert("一括呼び出しに失敗しました。");
   }
 };
 
-// ⑥ 混雑状況・色分けの更新
 window.updateCongestionMessage = async function() {
   const levelSelect = document.getElementById("select-congestion-level");
   const inputEl = document.getElementById("input-congestion-msg");
@@ -419,12 +450,9 @@ window.updateCongestionMessage = async function() {
     }, { merge: true });
     alert("混雑状況を更新しました！");
     inputEl.value = "";
-  } catch (e) {
-    alert("更新失敗");
-  }
+  } catch (e) { alert("更新失敗"); }
 };
 
-// 待機一覧のロード（時間枠列入り）
 function loadAdminQueue() {
   const q = query(
     collection(db, "tickets"), 
@@ -497,7 +525,6 @@ function start10MinTimer(ticketId, holdTime) {
   }, 1000);
 }
 
-// ⑤ 履歴CSVの書き出し機能
 window.exportHistoryCSV = async function() {
   try {
     const snapshot = await getDocs(query(collection(db, "tickets"), orderBy("createdAt", "asc")));
@@ -516,9 +543,7 @@ window.exportHistoryCSV = async function() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  } catch (e) {
-    alert("CSV出力失敗");
-  }
+  } catch (e) { alert("CSV出力失敗"); }
 };
 
 function loadAdminHistoryAndStats() {
@@ -551,6 +576,7 @@ function loadAdminHistoryAndStats() {
   });
 }
 
+// 次の1組呼び出し
 window.callNext = async function() {
   try {
     const q = query(collection(db, "tickets"), where("status", "==", "待機中"), orderBy("createdAt", "asc"));
@@ -558,7 +584,6 @@ window.callNext = async function() {
     if (!snapshot.empty) {
       const nextId = snapshot.docs[0].id;
       await updateDoc(doc(db, "tickets", nextId), { status: "呼び出し中" });
-      await setDoc(doc(db, "counters", "queue"), { currentNumber: nextId }, { merge: true });
     } else { alert("待機中のグループはありません。"); }
   } catch (e) {}
 };
@@ -570,9 +595,6 @@ window.callPrev = async function() {
     if (!snapshot.empty) {
       const currentId = snapshot.docs[0].id;
       await updateDoc(doc(db, "tickets", currentId), { status: "待機中" });
-      const prevSnap = await getDocs(query(collection(db, "tickets"), where("status", "==", "呼び出し中"), orderBy("createdAt", "desc")));
-      const newCalling = prevSnap.empty ? "---" : prevSnap.docs[0].id;
-      await setDoc(doc(db, "counters", "queue"), { currentNumber: newCalling }, { merge: true });
     } else { alert("呼び出し中のグループはありません。"); }
   } catch (e) {}
 };
@@ -604,7 +626,6 @@ window.resetAllTestData = async function() {
     await Promise.all(deletePromises);
 
     await setDoc(doc(db, "counters", "queue"), {
-      currentNumber: "---",
       nextNumber: 0,
       isAccepting: true,
       congestionLevel: "smooth",
