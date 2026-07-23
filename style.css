@@ -1,0 +1,225 @@
+:root {
+  --bg-color: #080b10;
+  --card-bg: rgba(16, 24, 48, 0.6);
+  --card-border: rgba(0, 243, 255, 0.3);
+  --neon-blue: #00f3ff;
+  --neon-pink: #ff0055;
+  --text-color: #e0f7fc;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* 背景グリッドエフェクト */
+.grid-bg {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+  z-index: -1;
+}
+
+/* Glassmorphism Navigation */
+.glass-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: rgba(10, 15, 30, 0.7);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--card-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: var(--neon-blue);
+  text-shadow: 0 0 10px var(--neon-blue);
+}
+
+.nav-links button {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  margin-left: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.nav-links button:hover {
+  color: var(--neon-pink);
+}
+
+/* Glassmorphism Card */
+.container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  margin-bottom: 2rem;
+}
+
+/* テキスト・ボタン演出 */
+.neon-text-blue {
+  color: var(--neon-blue);
+  text-shadow: 0 0 10px var(--neon-blue);
+}
+
+.neon-text-pink {
+  color: var(--neon-pink);
+  text-shadow: 0 0 10px var(--neon-pink);
+}
+
+.subtitle {
+  margin: 1rem 0 2rem 0;
+  opacity: 0.8;
+}
+
+.neon-btn {
+  background: transparent;
+  border: 2px solid;
+  padding: 0.8rem 1.8rem;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 0.5rem;
+}
+
+.neon-btn.blue {
+  color: var(--neon-blue);
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
+.neon-btn.blue:hover {
+  background: var(--neon-blue);
+  color: #000;
+  box-shadow: 0 0 20px var(--neon-blue);
+}
+
+.neon-btn.pink {
+  color: var(--neon-pink);
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 10px rgba(ff, 0, 85, 0.3);
+}
+
+.neon-btn.pink:hover {
+  background: var(--neon-pink);
+  color: #fff;
+  box-shadow: 0 0 20px var(--neon-pink);
+}
+
+.neon-btn.danger {
+  color: #ff4444;
+  border-color: #ff4444;
+}
+
+.neon-btn.danger:hover {
+  background: #ff4444;
+  color: #fff;
+}
+
+.glass-input {
+  width: 100%;
+  padding: 0.8rem;
+  margin: 1rem 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--card-border);
+  color: var(--text-color);
+  border-radius: 8px;
+}
+
+/* ダッシュボード UI */
+.status-dashboard {
+  display: flex;
+  justify-content: space-around;
+  margin: 1.5rem 0;
+}
+
+.status-box {
+  text-align: center;
+}
+
+.big-number {
+  font-size: 2.5rem;
+  font-weight: bold;
+  display: block;
+}
+
+.neon-divider {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+  margin: 1.5rem 0;
+}
+
+.hidden { display: none !important; }
+
+/* 点滅アニメーション（画面呼び出し用） */
+@keyframes neon-blink {
+  0%, 100% { opacity: 1; box-shadow: 0 0 30px var(--neon-pink); }
+  50% { opacity: 0.3; box-shadow: 0 0 5px var(--neon-pink); }
+}
+
+.blink-animation {
+  animation: neon-blink 1s infinite;
+  border-color: var(--neon-pink) !important;
+}
+
+/* モーダル */
+.modal {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.queue-list {
+  list-style: none;
+  margin-top: 1rem;
+}
+
+.queue-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.8rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
