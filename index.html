@@ -49,8 +49,8 @@
       <div class="video-section">
         <h3 class="video-title">▼紹介動画</h3>
         <div class="video-container">
-          <video controls poster="thumbnail.jpg">
-            <source src="movie.mp4" type="video/mp4">
+          <video controls poster="紹介動画 サムネ.png">
+            <source src="文化祭予告編.mp4" type="video/mp4">
             お使いのブラウザは動画再生に対応していません。
           </video>
         </div>
@@ -113,10 +113,12 @@
           <span class="congestion-text">ただいま順調にご案内中です</span>
         </div>
 
-        <div class="status-dashboard">
+        <div class="status-dashboard" style="flex-direction: column; gap:1rem;">
           <div class="status-box">
             <span class="label">現在呼び出し中</span>
-            <span id="current-calling-num" class="big-number text-pink">---</span>
+            <div id="current-calling-container" class="calling-numbers-flex">
+              <span class="big-number text-pink">---</span>
+            </div>
           </div>
           <div class="status-box">
             <span class="label">全体待機組数</span>
@@ -178,11 +180,36 @@
             
             <hr class="neon-divider" style="margin: 0.8rem 0;">
 
-            <h4>📢 全画面一斉ポップアップ配信（①）</h4>
+            <h4>📢 全画面一斉ポップアップ配信</h4>
             <div class="congestion-input-group">
               <input type="text" id="input-broadcast-msg" class="glass-input" placeholder="例: ただいま機材調整のため10分間案内を中断します">
               <button class="action-btn pink-btn small-action" onclick="sendBroadcastAnnouncement()">全員に配信</button>
             </div>
+          </div>
+
+          <div class="admin-section-box">
+            <h4>⏰ 時間枠一括呼び出し</h4>
+            <div class="congestion-input-group">
+              <select id="select-call-slot" class="glass-input">
+                <option value="09:30">09:30 枠全員</option>
+                <option value="10:00">10:00 枠全員</option>
+                <option value="10:30">10:30 枠全員</option>
+                <option value="11:00">11:00 枠全員</option>
+                <option value="11:30">11:30 枠全員</option>
+                <option value="12:00">12:00 枠全員</option>
+                <option value="12:30">12:30 枠全員</option>
+                <option value="13:00">13:00 枠全員</option>
+                <option value="13:30">13:30 枠全員</option>
+                <option value="14:00">14:00 枠全員</option>
+              </select>
+              <button class="action-btn pink-btn small-action" onclick="callEntireSlot()">この枠の全員を呼び出す</button>
+            </div>
+          </div>
+
+          <div class="admin-controls-grid">
+            <button class="action-btn danger-btn" onclick="callPrev()">◀ 前に戻す</button>
+            <button class="action-btn blue-btn lg" onclick="callNext()">▶ 次の1組を呼び出す</button>
+            <button class="action-btn warning-btn" onclick="skipCurrent()">スキップ (保留)</button>
           </div>
 
           <div class="admin-section-box">
@@ -196,12 +223,6 @@
               <input type="text" id="input-congestion-msg" class="glass-input" placeholder="アナウンス文言">
               <button class="action-btn blue-btn small-action" onclick="updateCongestionMessage()">更新</button>
             </div>
-          </div>
-
-          <div class="admin-controls-grid">
-            <button class="action-btn danger-btn" onclick="callPrev()">◀ 前に戻す</button>
-            <button class="action-btn blue-btn lg" onclick="callNext()">▶ 次の組を呼び出す</button>
-            <button class="action-btn warning-btn" onclick="skipCurrent()">スキップ (保留)</button>
           </div>
 
           <div class="admin-queue">
