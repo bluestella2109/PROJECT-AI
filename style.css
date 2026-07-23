@@ -1,6 +1,6 @@
 :root {
   --bg-color: #06090e;
-  --card-bg: rgba(12, 18, 32, 0.75);
+  --card-bg: rgba(12, 18, 32, 0.85);
   --card-border: rgba(255, 255, 255, 0.12);
   --neon-blue: #00f3ff;
   --neon-pink: #ff0055;
@@ -11,7 +11,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
 }
 
 body {
@@ -22,54 +22,68 @@ body {
   position: relative;
 }
 
+/* ⑥ ランダム数字背景 Canvas */
+#cyber-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: -2;
+  opacity: 0.18; /* 薄灰色で主張しすぎない透過度 */
+  pointer-events: none;
+}
+
 /* 背景グリッドエフェクト */
 .grid-bg {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
   background-size: 36px 36px;
   background-image: 
-    linear-gradient(to right, rgba(0, 243, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 243, 255, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
   z-index: -1;
+  pointer-events: none;
 }
 
-/* ヘッダー・ナビゲーション */
+/* ヘッダー */
 .glass-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.8rem 1.5rem;
-  background: rgba(6, 10, 20, 0.85);
+  padding: 0.6rem 1rem;
+  background: rgba(6, 10, 20, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--card-border);
-  position: sticky;
-  top: 0;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
   z-index: 100;
 }
 
 .logo-group {
   text-align: left;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .logo-title {
   font-family: 'Times New Roman', serif;
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-weight: bold;
-  letter-spacing: 2px;
   color: #ffffff;
-  line-height: 1.1;
+  white-space: nowrap;
 }
 
 .logo-sub {
-  font-size: 0.65rem;
+  font-size: 0.55rem;
   color: #a0b0c0;
-  letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .nav-links {
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .nav-links button {
@@ -77,8 +91,7 @@ body {
   border: none;
   color: #ffffff;
   cursor: pointer;
-  font-size: 1.1rem;
-  font-weight: bold;
+  padding: 0.2rem 0.3rem;
   transition: color 0.3s;
 }
 
@@ -86,63 +99,57 @@ body {
   color: var(--neon-pink);
 }
 
-.nav-sub {
-  font-size: 0.85rem;
-  opacity: 0.8;
-}
+.nav-main { font-size: 0.85rem; font-weight: bold; }
+.nav-sub { font-size: 0.8rem; opacity: 0.9; }
 
 /* メインコンテナ */
 .container {
   max-width: 720px;
   margin: 0 auto;
-  /* 上に 100px の余白を追加して、ヘッダーとの被りを解消 */
-  padding: 200px 1rem 3rem 1rem; 
+  padding: 120px 1rem 3rem 1rem; /* ヘッダーかぶり回避 */
 }
 
-.page {
-  display: none;
-}
+.page { display: none; }
+.page.active { display: block; }
 
-.page.active {
-  display: block;
-}
-
-/* ガラス風カードデザイン */
+/* ガラスカード */
 .glass-card {
   background: var(--card-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--card-border);
   border-radius: 20px;
-  padding: 2.5rem 1.5rem;
+  padding: 2rem 1.2rem;
   text-align: center;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
   margin-bottom: 1.5rem;
 }
 
-/* ヒーロー（トップページ）タイトル */
 .main-title {
   font-family: 'Times New Roman', serif;
-  font-size: 2.8rem;
+  font-size: 2.2rem;
   font-weight: bold;
-  letter-spacing: 3px;
   color: #ffffff;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.2rem;
 }
 
 .main-sub {
-  font-size: 0.95rem;
+  font-size: 0.8rem;
   color: #d0dbe5;
-  margin-bottom: 2rem;
-  letter-spacing: 1px;
+  margin-bottom: 1.8rem;
 }
 
-/* カプセル風ボタン */
 .hero-buttons {
   display: flex;
   justify-content: center;
-  gap: 1.2rem;
-  flex-wrap: wrap;
+  gap: 1rem;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (min-width: 480px) {
+  .hero-buttons { flex-direction: row; }
+  .main-title { font-size: 2.6rem; }
 }
 
 .neon-btn {
@@ -150,7 +157,8 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 180px;
+  width: 100%;
+  max-width: 240px;
   padding: 0.7rem 1rem;
   border-radius: 40px;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -158,81 +166,73 @@ body {
   transition: all 0.3s ease;
 }
 
-/* 予約ボタン（赤） */
-.btn-reserve {
-  background: linear-gradient(135deg, #7a2b2b, #4a1818);
-  color: #ffffff;
-}
+.btn-reserve { background: linear-gradient(135deg, #7a2b2b, #4a1818); color: #ffffff; }
+.btn-status { background: linear-gradient(135deg, #2b425b, #152436); color: #ffffff; }
 
-.btn-reserve:hover {
-  box-shadow: 0 0 20px rgba(255, 80, 80, 0.6);
-  transform: translateY(-2px);
-}
-
-/* 現在の状況ボタン（青） */
-.btn-status {
-  background: linear-gradient(135deg, #2b425b, #152436);
-  color: #ffffff;
-}
-
-.btn-status:hover {
-  box-shadow: 0 0 20px rgba(80, 160, 255, 0.6);
-  transform: translateY(-2px);
-}
-
-.btn-sub {
-  font-size: 0.7rem;
-  opacity: 0.8;
-  font-family: 'Times New Roman', serif;
-}
-
-.btn-main {
-  font-size: 1.25rem;
-  font-weight: bold;
-}
+.btn-sub { font-size: 0.65rem; opacity: 0.8; font-family: 'Times New Roman', serif; }
+.btn-main { font-size: 1.15rem; font-weight: bold; }
 
 /* 動画エリア */
-.video-section {
-  margin-top: 2rem;
-  text-align: left;
-}
-
-.video-title {
-  font-size: 1.3rem;
-  color: #ffffff;
-  margin-bottom: 0.8rem;
-  letter-spacing: 1px;
-}
+.video-section { margin-top: 1.5rem; text-align: left; }
+.video-title { font-size: 1.2rem; color: #ffffff; margin-bottom: 0.6rem; }
 
 .video-container {
   position: relative;
   width: 100%;
-  padding-top: 56.25%; /* 16:9 比率 */
+  padding-top: 56.25%;
   background: #000;
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
 }
 
-.video-container video,
-.video-container iframe {
+.video-container video {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0; width: 100%; height: 100%;
   object-fit: cover;
 }
 
-/* 汎用パーツ・テキスト */
+/* ⑦ 自分の受付番号拡大スタイル */
+.my-number-display {
+  background: rgba(0, 243, 255, 0.05);
+  border: 1px dashed var(--neon-blue);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.my-label {
+  font-size: 0.85rem;
+  color: #a0c0d0;
+}
+
+.my-ticket-hero {
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--neon-blue);
+  letter-spacing: 3px;
+  text-shadow: 0 0 15px rgba(0, 243, 255, 0.6);
+  margin: 0.2rem 0;
+}
+
+.highlight-num {
+  font-size: 1.8rem;
+  margin: 0 0.2rem;
+}
+
+.my-position-text {
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+}
+
+/* フォーム・ボタン類 */
 .text-blue { color: var(--neon-blue); }
 .text-pink { color: var(--neon-pink); }
 
 .glass-input {
   width: 100%;
-  padding: 0.9rem;
-  margin: 1rem 0;
+  padding: 0.8rem;
+  margin: 0.8rem 0;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--card-border);
   color: var(--text-color);
@@ -242,100 +242,119 @@ body {
 
 .action-btn {
   width: 100%;
-  padding: 0.9rem;
+  padding: 0.8rem;
   border-radius: 8px;
   border: none;
   font-weight: bold;
   font-size: 1rem;
   cursor: pointer;
   transition: 0.3s;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
-.blue-btn {
-  background: var(--neon-blue);
-  color: #000;
-}
-
-.blue-btn:hover {
-  box-shadow: 0 0 15px var(--neon-blue);
-}
-
-.pink-btn {
-  background: var(--neon-pink);
-  color: #fff;
-}
-
-.danger-btn {
-  background: #dc3545;
-  color: #fff;
-}
+.blue-btn { background: var(--neon-blue); color: #000; }
+.pink-btn { background: var(--neon-pink); color: #fff; }
+.danger-btn { background: #dc3545; color: #fff; }
+.warning-btn { background: #ffc107; color: #000; }
 
 .small-btn {
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid var(--card-border);
   color: #fff;
-  padding: 0.2rem 0.6rem;
+  padding: 0.2rem 0.5rem;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
+  margin: 0.2rem;
 }
 
-/* ダッシュボード UI */
+/* 管理者画面の操作ボタン＆テーブル */
+.admin-controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.8rem;
+  font-size: 0.85rem;
+}
+
+.admin-table th, .admin-table td {
+  padding: 0.6rem 0.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+}
+
+.admin-table th {
+  background: rgba(255, 255, 255, 0.05);
+  color: #a0c0d0;
+}
+
+/* ⑤ 統計カード */
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 0.8rem 0.4rem;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  display: block;
+  color: #a0a0a0;
+}
+
+.stat-value {
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.history-table-wrapper {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+/* 共通UI */
 .status-dashboard {
   display: flex;
   justify-content: space-around;
-  margin: 1.5rem 0;
+  margin: 1.2rem 0;
 }
 
-.big-number {
-  font-size: 2.8rem;
-  font-weight: bold;
-  display: block;
-}
+.big-number { font-size: 2.4rem; font-weight: bold; display: block; }
 
 .neon-divider {
   border: 0;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--card-border), transparent);
-  margin: 1.5rem 0;
+  margin: 1.2rem 0;
 }
 
 .hidden { display: none !important; }
 
-/* 呼び出し点滅アニメーション */
+/* 点滅モーダル */
 @keyframes neon-blink {
   0%, 100% { opacity: 1; box-shadow: 0 0 35px var(--neon-pink); }
   50% { opacity: 0.4; box-shadow: 0 0 10px var(--neon-pink); }
 }
 
-.blink-animation {
-  animation: neon-blink 1s infinite;
-  border-color: var(--neon-pink) !important;
-}
+.blink-animation { animation: neon-blink 1s infinite; border-color: var(--neon-pink) !important; }
 
-/* モーダル */
 .modal {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
   background: rgba(0,0,0,0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  padding: 1rem;
-}
-
-.queue-list {
-  list-style: none;
-  margin-top: 1rem;
-  text-align: left;
-}
-
-.queue-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.8rem;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 1000; padding: 1rem;
 }
