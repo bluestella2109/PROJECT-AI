@@ -24,23 +24,36 @@
       background: rgba(0, 243, 255, 0.05);
       border: 2px solid var(--neon-blue);
       border-radius: 24px;
+      padding: 1.5rem;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
       box-shadow: 0 0 50px rgba(0, 243, 255, 0.2);
     }
     .calling-label {
-      font-size: 2.5rem;
+      font-size: 2rem;
       color: #a0c0d0;
-      letter-spacing: 4px;
+      letter-spacing: 2px;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .calling-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      align-content: center;
+      flex-grow: 1;
+      overflow-y: auto;
     }
     .calling-hero-number {
-      font-size: 8rem;
+      font-size: 3.5rem;
       font-weight: bold;
       color: var(--neon-pink);
-      text-shadow: 0 0 30px var(--neon-pink);
-      margin: 1rem 0;
+      text-shadow: 0 0 25px var(--neon-pink);
+      background: rgba(255, 0, 85, 0.1);
+      border: 2px solid var(--neon-pink);
+      border-radius: 16px;
+      padding: 1rem;
+      text-align: center;
     }
     .waiting-side-card {
       background: var(--card-bg);
@@ -93,9 +106,11 @@
 
   <div class="display-container">
     <div class="calling-main-card">
-      <div class="calling-label">現在のお呼び出し番号</div>
-      <div id="disp-current-num" class="calling-hero-number">---</div>
-      <div id="disp-congestion-text" class="congestion-msg" style="font-size: 1.5rem; color: #fff;">ただいま順調にご案内中です</div>
+      <div class="calling-label">📢 現在のお呼び出し番号</div>
+      <div id="disp-calling-grid" class="calling-grid">
+        <div class="calling-hero-number">---</div>
+      </div>
+      <div id="disp-congestion-text" class="congestion-msg" style="font-size: 1.3rem; color: #fff; text-align:center; margin-top:1rem;">ただいま順調にご案内中です</div>
     </div>
 
     <div class="waiting-side-card">
@@ -124,29 +139,43 @@
 
     // 時計更新
     setInterval(() => {
-      const now = new Date();
-      document.getElementById("clock-display").innerText = now.toLocaleTimeString('ja-JP');
+      document.getElementById("clock-display").innerText = new Date().toLocaleTimeString('ja-JP');
     }, 1000);
 
-    // 呼び出し監視
+    // 混雑メッセージ監視
     onSnapshot(doc(db, "counters", "queue"), (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-        document.getElementById("disp-current-num").innerText = data.currentNumber || "---";
         document.getElementById("disp-congestion-text").innerText = data.congestionMessage || "ただいま順調にご案内中です";
       }
     });
 
+    // 呼び出し中全員の監視
+    const qCalling = query(collection(db, "tickets"), where("status", "==", "呼び出し中"), orderBy("createdAt", "asc"));
+    onSnapshot(qCalling, (snapshot) => {
+      const gridEl = document.getElementById("disp-calling-grid");
+      gridEl.innerHTML = "";
+      if (snapshot.empty) {
+        gridEl.innerHTML = '<div class="calling-hero-number">---</div>';
+      } else {
+        snapshot.forEach(docSnap => {
+          const box = document.createElement("div");
+          box.className = "calling-hero-number";
+          box.innerText = docSnap.data().ticket;
+          gridEl.appendChild(box);
+        });
+      }
+    });
+
     // 待機監視
-    const q = query(collection(db, "tickets"), where("status", "==", "待機中"), orderBy("createdAt", "asc"), limit(12));
-    onSnapshot(q, (snapshot) => {
+    const qWaiting = query(collection(db, "tickets"), where("status", "==", "待機中"), orderBy("createdAt", "asc"), limit(12));
+    onSnapshot(qWaiting, (snapshot) => {
       const listEl = document.getElementById("disp-waiting-list");
       listEl.innerHTML = "";
       snapshot.forEach(docSnap => {
-        const data = docSnap.data();
         const box = document.createElement("div");
         box.className = "display-num-box";
-        box.innerText = data.ticket;
+        box.innerText = docSnap.data().ticket;
         listEl.appendChild(box);
       });
     });
