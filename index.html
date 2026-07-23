@@ -44,8 +44,8 @@
       <div class="video-section">
         <h3 class="video-title">▼紹介動画</h3>
         <div class="video-container">
-          <video controls poster="紹介動画 サムネ.png">
-            <source src="文化祭予告編.mp4" type="video/mp4">
+          <video controls poster="thumbnail.jpg">
+            <source src="movie.mp4" type="video/mp4">
             お使いのブラウザは動画再生に対応していません。
           </video>
         </div>
@@ -69,7 +69,7 @@
             <option value="9">9人</option>
             <option value="10">10人</option>
           </select>
-          <button id="btn-submit-reserve" class="action-btn red-btn" onclick="makeReservation()">予約を確定する</button>
+          <button id="btn-submit-reserve" class="action-btn blue-btn" onclick="makeReservation()">予約を確定する</button>
         </div>
         <div id="already-reserved-msg" class="hidden">
           <p class="warning-text">※すでに予約済みです（1端末1回のみ）。</p>
@@ -82,6 +82,11 @@
       <div class="glass-card">
         <h2 class="section-title text-blue">リアルタイム状況</h2>
         
+        <div id="congestion-banner" class="congestion-box">
+          <span class="congestion-icon">📢</span>
+          <span id="congestion-text" class="congestion-msg">ただいま順調にご案内中です</span>
+        </div>
+
         <div class="status-dashboard">
           <div class="status-box">
             <span class="label">現在呼び出し中</span>
@@ -110,7 +115,7 @@
               <p>予想待ち時間: 約 <strong id="my-wait-time">--</strong> 分</p>
             </div>
           </div>
-          <button class="action-btn red-btn" onclick="cancelReservation()">予約をキャンセルする</button>
+          <button class="action-btn danger-btn" onclick="cancelReservation()">予約をキャンセルする</button>
         </div>
 
         <div id="no-ticket-area">
@@ -126,7 +131,7 @@
         <div id="admin-login-area">
           <input type="email" id="admin-email" class="glass-input" placeholder="管理者メールアドレス">
           <input type="password" id="admin-pass" class="glass-input" placeholder="パスワード">
-          <button class="action-btn red-btn" onclick="adminLogin()">ログイン</button>
+          <button class="action-btn blue-btn" onclick="adminLogin()">ログイン</button>
         </div>
 
         <div id="admin-panel-area" class="hidden">
@@ -135,9 +140,17 @@
             <button class="small-btn" onclick="adminLogout()">ログアウト</button>
           </div>
 
+          <div class="admin-section-box">
+            <h4>📢 混雑状況アナウンス設定</h4>
+            <div class="congestion-input-group">
+              <input type="text" id="input-congestion-msg" class="glass-input" placeholder="例: ただいま大変混雑しております（待ち時間約30分）">
+              <button class="action-btn blue-btn small-action" onclick="updateCongestionMessage()">更新</button>
+            </div>
+          </div>
+
           <div class="admin-controls-grid">
-            <button class="action-btn pre-btn" onclick="callPrev()">◀ 前に戻す</button>
-            <button class="action-btn red-btn lg" onclick="callNext()">▶ 次の組を呼び出す</button>
+            <button class="action-btn danger-btn" onclick="callPrev()">◀ 前に戻す</button>
+            <button class="action-btn blue-btn lg" onclick="callNext()">▶ 次の組を呼び出す</button>
             <button class="action-btn warning-btn" onclick="skipCurrent()">スキップ (保留)</button>
           </div>
 
@@ -191,6 +204,13 @@
               </table>
             </div>
           </div>
+
+          <hr class="neon-divider">
+
+          <div class="admin-danger-zone">
+            <h4>⚠️ システムデータ管理</h4>
+            <button class="action-btn reset-btn" onclick="resetAllTestData()">テストデータを全リセットする</button>
+          </div>
         </div>
       </div>
     </section>
@@ -200,7 +220,7 @@
     <div class="modal-content glass-card blink-animation">
       <h2 class="text-pink">お呼び出し</h2>
       <p id="modal-msg">あなたの番号が呼び出されました！受付へお越しください。</p>
-      <button class="action-btn red-btn" onclick="closeModal()">確認しました</button>
+      <button class="action-btn blue-btn" onclick="closeModal()">確認しました</button>
     </div>
   </div>
 
